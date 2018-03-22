@@ -1,7 +1,7 @@
 package cn.hurrican.test;
 
 import cn.hurrican.service.SearchService;
-import cn.hurrican.service.impl.SearchServiceImpl;
+import cn.hurrican.impl.SearchServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;

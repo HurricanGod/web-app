@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- monitorInterval="1800" 指log4j2每隔1800秒（半小时），自动监控该配置文件是否有变化，如果变化，则自动根据文件内容重新配置 -->
+<configuration status="off" monitorInterval="1800">
+
+    <properties>
+        <property name="log.dir">${web:rootDir}/logs/youyu</property>
+        <!-- <property name="log.dir">logs/youyu</property> -->
+    </properties>
+
+    <!--先定义所有的appender -->
+    <appenders>
+
+        <!--这个输出控制台的配置 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="trace" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <PatternLayout
+                    pattern="%d{yy/MM/dd HH:mm:ss.SSS} %-5level %logger{36} %L %M - %m%xEx%n"/>
+        </Console>
+
+        <!-- 打印错误日志 -->
+        <RollingFile name="STDERR" fileName="${log.dir}/web/err.log"
+                     filePattern="${log.dir}/web/err-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- 定时封存 -->
+                <!-- <TimeBasedTriggeringPolicy interval="6" modulate="true"/> -->
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+
+            <ThresholdFilter level="error" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <!-- 如果不设置，默认为7 -->
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+
+        <RollingFile name="WARN" fileName="${log.dir}/web/warn.log"
+                     filePattern="${log.dir}/web/warn-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="warn" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile name="INFO" fileName="${log.dir}/web/info.log"
+                     filePattern="${log.dir}/web/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile name="nianhui" fileName="${log.dir}/nianhui/info.log"
+                     filePattern="${log.dir}/nianhui/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <!-- <PatternLayout pattern="%d{yy/MM/dd HH:mm:ss.SSS} %-5level %c{36}
+                %L %M - %m%xEx%n"/> -->
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile name="wxpay" fileName="${log.dir}/wxpay/info.log"
+                     filePattern="${log.dir}/wxpay/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <!-- 表示压缩包，最多保留20个 -->
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <!-- 引擎日志 -->
+        <RollingFile name="newgame" fileName="${log.dir}/newgame/info.log"
+                     filePattern="${log.dir}/newgame/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="meeting" fileName="${log.dir}/meeting/info.log"
+                     filePattern="${log.dir}/meetingg/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="jifenbao" fileName="${log.dir}/jifenbao/info.log"
+                     filePattern="${log.dir}/jifenbao/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+
+        <RollingFile name="gameplatform" fileName="${log.dir}/gameplatform/info.log"
+                     filePattern="${log.dir}/gameplatform/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile name="babyvote" fileName="${log.dir}/babyvote/info.log"
+                     filePattern="${log.dir}/babyvote/info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout>
+                <pattern>
+                    %n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT"
+                             onMismatch="DENY"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+    </appenders>
+    <Loggers>
+        <Logger name="com.weixinjia.recreation.mapper" additivity="false"
+                level="trace">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <logger name="com.weixinjia.recreation.wxapi.wxpay" level="info"
+                additivity="false">
+            <AppenderRef ref="wxpay"/>
+        </logger>
+        <logger name="com.weixinjia.recreation.nianhui" level="info"
+                additivity="false">
+            <AppenderRef ref="nianhui"/>
+        </logger>
+        <Logger name="com.weixinjia.recreation.newbaseweb" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.newcore" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.gameservice" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.helprule" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.playrule" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.runtime" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.award" additivity="false"
+                level="info">
+            <AppenderRef ref="newgame"/>
+        </Logger>
+        <Logger name="com.weixinjia.recreation.meeting" additivity="false"
+                level="info">
+            <AppenderRef ref="meeting"/>
+        </Logger>
+        <logger name="com.weixinjia.recreation.jifenbao" additivity="false"
+                level="info">
+            <AppenderRef ref="jifenbao"/>
+        </logger>
+
+        <Logger name="com.weixinjia.recreation.gameplatform" additivity="false"
+                level="info">
+            <AppenderRef ref="gameplatform"/>
+        </Logger>
+
+        <Logger name="com.weixinjia.recreation.vote" additivity="false"
+                level="info">
+            <AppenderRef ref="babyvote"/>
+        </Logger>
+        <!--建立一个默认的root的logger -->
+        <root level="info">
+            <AppenderRef ref="STDERR"/>
+            <AppenderRef ref="WARN"/>
+            <AppenderRef ref="INFO"/>
+            <AppenderRef ref="Console"/>
+            <!-- <AppenderRef ref="test"/> -->
+        </root>
+    </Loggers>
+</configuration>

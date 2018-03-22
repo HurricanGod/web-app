@@ -1,4 +1,4 @@
-package cn.hurrican.service.impl;
+package cn.hurrican.service;
 
 import cn.hurrican.service.MailService;
 import org.springframework.stereotype.Component;
