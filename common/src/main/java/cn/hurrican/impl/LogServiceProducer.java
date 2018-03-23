@@ -2,12 +2,12 @@ package cn.hurrican.impl;
 
 import cn.hurrican.model.ResMessage;
 import cn.hurrican.redis.RedisExecutor;
-import cn.hurrican.service.LogService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Aspect
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class LogServiceProducer {
 
     @Autowired
+    @Qualifier(value = "redisExecutor")
     private RedisExecutor executor;
 
     @Pointcut("@annotation(cn.hurrican.anotations.SystemLog)")
