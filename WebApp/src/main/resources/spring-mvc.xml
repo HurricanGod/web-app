@@ -4,15 +4,18 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd
-http://www.springframework.org/schema/mvc ">
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-
+    <!-- 增加切面配置 -->
+    <aop:aspectj-autoproxy/>
     <!-- SpringMVC默认异常处理器-->
     <!--<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">-->
     <!--<property name="defaultErrorView" value="/page/error.html"/>-->
@@ -41,7 +44,7 @@ http://www.springframework.org/schema/mvc ">
     -->
 
     <!-- 开启注解扫描-->
-    <context:component-scan base-package="cn.hurrican.*"/>
+    <context:component-scan base-package="cn.hurrican.controller*"/>
 
     <!-- 开启注解驱动-->
     <mvc:annotation-driven/>

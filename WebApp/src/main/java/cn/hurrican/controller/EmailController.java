@@ -18,7 +18,7 @@ public class EmailController extends BaseController {
 
 
     @SystemLog(level = 1)
-    @RequestMapping(value = "sendEmail.do", produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "sendEmail.do", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public ResMessage sendEmail() {
         System.out.println("execute send Email Service!");
