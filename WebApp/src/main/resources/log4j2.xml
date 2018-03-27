@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- monitorInterval="1800" 指log4j2每隔1800秒（半小时），
-自动监控该配置文件是否有变化，如果变化，则自动根据文件内容重新配置
+<!--
+    monitorInterval="1800" 指log4j2每隔1800秒（半小时），
+    自动监控该配置文件是否有变化，如果变化，则自动根据文件内容重新配置
  -->
 <configuration status="off" monitorInterval="1800">
 
     <properties>
-        <property name="log.dir">${web:rootDir}/logs</property>
-        <!-- <property name="log.dir">logs/youyu</property> -->
+        <property name="log.dir">logs</property>
     </properties>
 
     <!--先定义所有的appender -->
     <appenders>
-
         <!--这个输出控制台的配置 -->
         <Console name="Console" target="SYSTEM_OUT">
-            <ThresholdFilter level="trace" onMatch="ACCEPT"
-                             onMismatch="DENY"/>
-            <PatternLayout
-                    pattern="%d{yy/MM/dd HH:mm:ss.SSS} %-5level %logger{36} %L %M - %m%xEx%n"/>
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yy/MM/dd HH:mm:ss.SSS} %-5level %logger{36} %L %M - %m%xEx%n"/>
         </Console>
-
         <!-- 打印错误日志 -->
         <RollingFile name="STDERR" fileName="${log.dir}/web/err.log"
                      filePattern="${log.dir}/web/err-%d{yyyy-MM-dd}-%i.log" append="true">
@@ -75,8 +71,8 @@
         </RollingFile>
     </appenders>
     <Loggers>
-        <!--<Logger name="com.weixinjia.recreation.vote" additivity="false"-->
-        <!--level="info">-->
+        <!-- additivity 用途：是否将日志事件传递到Logger的父结点处理-->
+        <!--<Logger name="com.hurrican.controller" additivity="false" level="info">-->
         <!--<AppenderRef ref="babyvote"/>-->
         <!--</Logger>-->
         <!--建立一个默认的root的logger -->
@@ -85,7 +81,6 @@
             <AppenderRef ref="WARN"/>
             <AppenderRef ref="INFO"/>
             <AppenderRef ref="Console"/>
-            <!-- <AppenderRef ref="test"/> -->
         </root>
     </Loggers>
 </configuration>

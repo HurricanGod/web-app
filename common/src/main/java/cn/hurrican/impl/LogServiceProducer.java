@@ -30,7 +30,10 @@ public class LogServiceProducer {
     public void checkValidate(JoinPoint joinPoint) {
         System.out.println("execute do before!");
         Object[] args = joinPoint.getArgs();
-        System.out.println();
+        for (int i = 0; i < args.length; i++) {
+            System.out.println(args[i]);
+        }
+        throw new RuntimeException("参数非法！");
     }
 
     @AfterReturning(pointcut = "controllerAspect()", returning = "returnVal")

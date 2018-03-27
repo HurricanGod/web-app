@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private EmailService emailService;
 
     @Override
@@ -17,7 +18,6 @@ public class UserServiceImpl implements UserService {
         return emailService.sendEmail().toUpperCase();
     }
 
-    @Autowired
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
     }
