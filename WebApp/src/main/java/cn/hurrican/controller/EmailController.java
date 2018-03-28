@@ -37,7 +37,6 @@ public class EmailController extends BaseController {
     @ResponseBody
     public ResMessage sendMap(@RequestParam(required = false) Map<String, Object> model, Integer id){
         model = model != null ? model : new HashMap<>();
-
         return ResMessage.creator().logIs("test").putAll(model);
     }
 }
