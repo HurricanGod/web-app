@@ -110,4 +110,11 @@ public class TestMethod {
         map.remove("hello");
         System.out.println((new Date()).getTime());
     }
+
+
+    @Test
+    public void testMethod6() {
+        int a = 1;
+        System.out.println();
+    }
 }

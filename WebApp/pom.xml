@@ -160,6 +160,11 @@
             <version>1.5.9.RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.4</version>
+        </dependency>
         <!--mockito测试依赖-->
 
     </dependencies>

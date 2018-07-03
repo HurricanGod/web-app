@@ -3,6 +3,7 @@ package cn.hurrican.controller;
 
 import cn.hurrican.anotations.ValidateRequestParam;
 import cn.hurrican.exception.BaseAspectRuntimeException;
+import cn.hurrican.model.AppletSceneParam;
 import cn.hurrican.model.ResMessage;
 import cn.hurrican.model.Riddles;
 import cn.hurrican.utils.JSONUtils;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +50,23 @@ public class HomeController {
                 e1.printStackTrace();
             }
         }
+    }
+
+
+    @RequestMapping(value = "/test.do", produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public ResMessage test() {
+        ResMessage resMessage = ResMessage.creator();
+        String calssName = "cn.hurrican.model.AppletSceneDetail";
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("aid", 1);
+        properties.put("appid", "wxc869c96b05be267f");
+        properties.put("createtime", new Date());
+        properties.put("scenetype", 1);
+        properties.put("openid", "dceeewcece_aADASDWQDQ");
+        AppletSceneParam param = AppletSceneParam.init(calssName, properties);
+        resMessage.put("param", param);
+        return resMessage;
     }
 
 }
