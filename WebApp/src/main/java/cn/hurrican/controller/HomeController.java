@@ -1,16 +1,13 @@
 package cn.hurrican.controller;
 
-
 import cn.hurrican.anotations.ValidateRequestParam;
 import cn.hurrican.exception.BaseAspectRuntimeException;
 import cn.hurrican.model.AppletSceneParam;
 import cn.hurrican.model.ResMessage;
 import cn.hurrican.model.Riddles;
-import cn.hurrican.utils.JSONUtils;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,6 +19,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "/home")
 public class HomeController {
+
 
     @RequestMapping(value = "/{title}/end.do", produces = "application/json;charset=utf-8")
     @ResponseBody
@@ -57,14 +55,14 @@ public class HomeController {
     @ResponseBody
     public ResMessage test() {
         ResMessage resMessage = ResMessage.creator();
-        String calssName = "cn.hurrican.model.AppletSceneDetail";
+        String className = "cn.hurrican.model.AppletSceneDetail";
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("aid", 1);
         properties.put("appid", "wxc869c96b05be267f");
         properties.put("createtime", new Date());
         properties.put("scenetype", 1);
         properties.put("openid", "dceeewcece_aADASDWQDQ");
-        AppletSceneParam param = AppletSceneParam.init(calssName, properties);
+        AppletSceneParam param = AppletSceneParam.init(className, properties);
         resMessage.put("param", param);
         return resMessage;
     }
