@@ -3,7 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="rocketmqConsumer" class="org.apache.rocketmq.client.consumer.DefaultMQPushConsumer" init-method="start"
+    <bean id="rocketmqConsumer"
+          class="org.apache.rocketmq.client.consumer.DefaultMQPushConsumer"
+          init-method="start"
           destroy-method="shutdown">
         <property name="consumerGroup" value="concurrent_consumer"/>
         <property name="namesrvAddr" value="127.0.0.1:9876"/>
