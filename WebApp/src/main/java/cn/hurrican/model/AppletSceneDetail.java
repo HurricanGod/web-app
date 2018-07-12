@@ -1,5 +1,6 @@
 package cn.hurrican.model;
 
+import cn.hurrican.aop.EnableCache;
 import lombok.Data;
 import net.sf.json.JSONObject;
 

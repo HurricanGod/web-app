@@ -10,9 +10,12 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
+import java.util.ArrayList;
 
 /**
  * @Author: Hurrican
@@ -27,9 +30,10 @@ public class BaseInitController extends BaseController{
 
 
     @RequestMapping(value = "/init.do", produces = "application/json;charset=UTF-8")
+    @ResponseBody
     public ResMessage init(){
 
-        return null;
+        return ResMessage.creator();
     }
 
 
@@ -43,4 +47,20 @@ public class BaseInitController extends BaseController{
         return ResMessage.creator().retCodeEqual(0).logIs("success").put("randomInt", val);
     }
 
+
+    @RequestMapping(value = "/viewTest.do")
+    public ModelAndView viewTest(){
+        ModelAndView modelAndView = new ModelAndView("redirect:/template/item.jsp");
+        modelAndView.addObject("name", "Hurrican");
+        modelAndView.addObject("time", "2018年6月1日 11:40:06");
+
+        ArrayList<String> list = new ArrayList<>();
+        list.add("aaaaaaa");
+        list.add("BBBBBBB");
+        list.add("ccccccc");
+        list.add("ddddddd");
+        modelAndView.addObject("list", list);
+
+        return modelAndView;
+    }
 }

@@ -1,10 +1,12 @@
 package cn.hurrican.controller;
 
 import cn.hurrican.anotations.ValidateRequestParam;
+import cn.hurrican.aop.EnableCache;
 import cn.hurrican.exception.BaseAspectRuntimeException;
 import cn.hurrican.model.AppletSceneParam;
 import cn.hurrican.model.ResMessage;
 import cn.hurrican.model.Riddles;
+import cn.hurrican.utils.SpringContext;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,4 +71,22 @@ public class HomeController {
         return resMessage;
     }
 
+
+    @RequestMapping(value = "/getContext.do", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public ResMessage getContext(){
+        ResMessage resMessage = ResMessage.creator();
+        Map<String, Object> beansWithAnnotation = SpringContext.getContext().getBeansWithAnnotation(EnableCache.class);
+        beansWithAnnotation.forEach((k,v) -> {
+            System.out.println(k);
+            System.out.println(v);
+            Annotation[] annotations = v.getClass().getAnnotations();
+            Arrays.asList(annotations).forEach(e -> {
+                System.out.println(e.toString());
+            });
+        });
+        return resMessage;
+    }
+
 }
+

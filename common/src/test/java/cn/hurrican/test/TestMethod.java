@@ -113,8 +113,8 @@ public class TestMethod {
 
 
     @Test
-    public void testMethod6() {
-        int a = 1;
-        System.out.println();
+    public void testMethod6(){
+
     }
+
 }

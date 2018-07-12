@@ -42,6 +42,58 @@
         </mvc:interceptor>
     </mvc:interceptors>
     -->
+    <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolvers">
+            <set>
+                <ref bean="templateResolver" />
+            </set>
+        </property>
+    </bean>
+
+    <bean id="templateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/templates/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML5" />
+        <property name="cacheable" value="false" />
+    </bean>
+
+
+    <bean
+            class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+
+    <!-- 接续多视图 -->
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html" />
+                <entry key="json" value="application/json" />
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean id="viewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+                    <property name="templateEngine" ref="templateEngine" />
+                    <property name="characterEncoding" value="UTF-8" />
+                    <property name="viewNames" value="thymeleaf/*" />
+                    <property name="order" value="1" />
+                </bean>
+
+                <bean id="jspViewResolver"
+                      class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/templates/" />
+                    <property name="suffix" value=".jsp" />
+                    <property name="order" value="2" />
+                    <property name="viewNames" value="jsp/*" />
+                    <property name="exposeContextBeansAsAttributes" value="true" />
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+            </list>
+        </property>
+    </bean>
 
     <!-- 开启注解扫描-->
     <context:component-scan base-package="cn.hurrican.controller*"/>
