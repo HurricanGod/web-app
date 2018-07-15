@@ -1,8 +1,7 @@
 package cn.hurrican.model;
 
-import cn.hurrican.utils.ClassUtil;
+import cn.hurrican.utils.InstanceUtil;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -63,7 +62,7 @@ public class UniqueKeyElement {
 
     public String generatePostfixKey(){
         // key → 非空字段名; value → 值
-        Map<String, String> notNullFields = ClassUtil.getNotNullFields(this);
+        Map<String, String> notNullFields = InstanceUtil.getNotNullFields(this);
         String[] orderNotNullField = new String[fieldOrder.size()];
         notNullFields.forEach((k,v) ->{
             Integer index = fieldOrder.get(k);

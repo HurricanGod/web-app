@@ -1,35 +1,66 @@
+/**
+ * Created on  13-09-09 17:20
+ */
 package cn.hurrican.utils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.asm.Type;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @Author: Hurrican
- * @Description:
- * @Date 2018/7/12
- * @Modified 18:00
+ *
  */
 public class ClassUtil {
 
-    public static Map<String, String> getNotNullFields(Object obj){
-        HashMap<String, String> map = new HashMap<>(8);
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for(Field field : fields){
-            field.setAccessible(true);
-            try {
-                if(!Modifier.isStatic(field.getModifiers())){
-                    Object fieldValue = field.get(obj);
-                    if(fieldValue != null){
-                        map.put(field.getName(), fieldValue.toString());
-                    }
-                }
+    private static ConcurrentHashMap<Method, String> methodSigMap = new ConcurrentHashMap();
 
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+
+    public static String getShortClassName(String className) {
+        if (className == null) {
+            return null;
+        }
+        String[] ss = className.split("\\.");
+        StringBuilder sb = new StringBuilder(className.length());
+        for (int i = 0; i < ss.length; i++) {
+            String s = ss[i];
+            if (i != ss.length - 1) {
+                sb.append(s.charAt(0)).append('.');
+            } else {
+                sb.append(s);
             }
         }
-        return map;
+        return sb.toString();
+    }
+
+    public static Class<?>[] getAllInterfaces(Object obj) {
+        Class<?> c = obj.getClass();
+        HashSet<Class<?>> s = new HashSet<>();
+        do {
+            Class<?>[] its = c.getInterfaces();
+            Collections.addAll(s, its);
+            c = c.getSuperclass();
+        } while (c != null);
+        return s.toArray(new Class<?>[s.size()]);
+    }
+
+    private static void getMethodSig(StringBuilder sb, Method m) {
+        sb.append(m.getName());
+        sb.append(Type.getType(m).getDescriptor());
+    }
+
+    public static String getMethodSig(Method m) {
+        String sig = methodSigMap.get(m);
+        if (sig != null) {
+            return sig;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            getMethodSig(sb, m);
+            sig = sb.toString();
+            methodSigMap.put(m, sig);
+            return sig;
+        }
     }
 }

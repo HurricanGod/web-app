@@ -6,7 +6,7 @@ import cn.hurrican.exception.BaseAspectRuntimeException;
 import cn.hurrican.model.AppletSceneParam;
 import cn.hurrican.model.ResMessage;
 import cn.hurrican.model.Riddles;
-import cn.hurrican.utils.SpringContext;
+import cn.hurrican.aop.EnableCacheMethodInterceptor;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +76,7 @@ public class HomeController {
     @ResponseBody
     public ResMessage getContext(){
         ResMessage resMessage = ResMessage.creator();
-        Map<String, Object> beansWithAnnotation = SpringContext.getContext().getBeansWithAnnotation(EnableCache.class);
+        Map<String, Object> beansWithAnnotation = EnableCacheMethodInterceptor.getContext().getBeansWithAnnotation(EnableCache.class);
         beansWithAnnotation.forEach((k,v) -> {
             System.out.println(k);
             System.out.println(v);
