@@ -1,7 +1,7 @@
 package cn.hurrican.controller;
 
 import cn.hurrican.anotations.ValidateRequestParam;
-import cn.hurrican.aop.EnableCache;
+import cn.hurrican.annotation.EnableCache;
 import cn.hurrican.exception.BaseAspectRuntimeException;
 import cn.hurrican.model.AppletSceneParam;
 import cn.hurrican.model.ResMessage;

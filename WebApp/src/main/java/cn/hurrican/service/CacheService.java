@@ -1,8 +1,8 @@
 package cn.hurrican.service;
 
-import cn.hurrican.aop.CacheValue;
-import cn.hurrican.aop.KeyParam;
-import cn.hurrican.aop.WriteCache;
+import cn.hurrican.annotation.CacheValue;
+import cn.hurrican.annotation.KeyParam;
+import cn.hurrican.annotation.WriteCache;
 import cn.hurrican.config.KeyType;
 import org.springframework.stereotype.Service;
 

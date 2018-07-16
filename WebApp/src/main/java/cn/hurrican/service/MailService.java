@@ -1,10 +1,6 @@
 package cn.hurrican.service;
 
 
-import cn.hurrican.aop.EnableCache;
-
-
-
 public interface MailService {
 
     /**

@@ -1,7 +1,6 @@
 package cn.hurrican.service;
 
-import cn.hurrican.aop.EnableCache;
-import cn.hurrican.service.MailService;
+import cn.hurrican.annotation.EnableCache;
 import org.springframework.stereotype.Component;
 
 @Component

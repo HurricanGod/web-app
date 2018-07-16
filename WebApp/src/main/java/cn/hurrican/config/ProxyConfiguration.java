@@ -1,14 +1,13 @@
 package cn.hurrican.config;
 
 import cn.hurrican.aop.CacheAdvisor;
-import cn.hurrican.aop.EnableCache;
+import cn.hurrican.annotation.EnableCache;
 import cn.hurrican.aop.EnableCacheMethodInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.AnnotationAttributes;

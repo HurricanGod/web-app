@@ -1,5 +1,6 @@
 package cn.hurrican.aop;
 
+import cn.hurrican.annotation.EnableCache;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.logging.log4j.LogManager;

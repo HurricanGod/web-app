@@ -1,6 +1,4 @@
-package cn.hurrican.aop;
-
-import cn.hurrican.config.CacheConstant;
+package cn.hurrican.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -12,11 +10,11 @@ import java.lang.annotation.Target;
  * @Author: Hurrican
  * @Description:
  * @Date 2018/7/16
- * @Modified 9:15
+ * @Modified 11:35
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 @Documented
-public @interface KeyParam {
-    String value() default CacheConstant.UNDEFINED_NAME;
+public @interface ListIndex {
+    boolean rightPush() default true;
 }

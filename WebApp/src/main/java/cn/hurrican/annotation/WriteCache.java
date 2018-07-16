@@ -1,4 +1,4 @@
-package cn.hurrican.aop;
+package cn.hurrican.annotation;
 
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;

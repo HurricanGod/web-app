@@ -1,9 +1,9 @@
 package cn.hurrican.aspect;
 
-import cn.hurrican.aop.CacheValue;
-import cn.hurrican.aop.HashField;
-import cn.hurrican.aop.KeyParam;
-import cn.hurrican.aop.WriteCache;
+import cn.hurrican.annotation.CacheValue;
+import cn.hurrican.annotation.HashField;
+import cn.hurrican.annotation.KeyParam;
+import cn.hurrican.annotation.WriteCache;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
 import cn.hurrican.redis.RedisExecutor;
@@ -35,7 +35,7 @@ public class WriteCacheAspect {
     private RedisExecutor executor;
 
 
-    @Pointcut("@annotation(cn.hurrican.aop.WriteCache)")
+    @Pointcut("@annotation(cn.hurrican.annotation.WriteCache)")
     public boolean cacheValue() {
         return true;
     }
