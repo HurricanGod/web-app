@@ -77,7 +77,7 @@ public class UniqueKeyElement {
         UniqueKeyElement keyElement = UniqueKeyElement.build().aidIs(1).openidIs("openid");
 
         String key = keyElement.generatePostfixKey();
-        System.out.println("key = " + key);
+        System.out.println("prefixKey = " + key);
     }
 
 

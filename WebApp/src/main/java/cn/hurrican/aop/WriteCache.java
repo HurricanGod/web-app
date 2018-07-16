@@ -17,11 +17,29 @@ import java.lang.annotation.*;
 @Documented
 public @interface WriteCache {
 
+    /**
+     * 缓存 key 所属的类型
+     * @return
+     */
     int type() default KeyType.CHAR_STRING;
 
+    /**
+     * 缓存有效时间，单位：秒
+     * @return
+     */
     int expire() default 3600;
 
-    String keyPrefix() default CacheConstant.UNDEFINED_NAME;
+    /**
+     * 缓存 key 前缀
+     * @return
+     */
+    String prefixKey() default CacheConstant.UNDEFINED_NAME;
+
+    /**
+     * 缓存 key 后缀
+     * @return
+     */
+    String postfixKey() default "";
 
     double score() default 0;
 

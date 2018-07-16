@@ -15,7 +15,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
 
-@Configuration
+//@Configuration
 public class ProxyConfiguration implements ApplicationContextAware, ImportAware {
 
     private AnnotationAttributes enableCacheAttributes;
