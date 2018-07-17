@@ -12,4 +12,7 @@ public interface CacheConstant {
 
     /** 缓存中的 key 用不过期 **/
     int NEVER_EXPIRE = -1;
+
+    /** 进入 Redis list 的方式 **/
+    int RPUSH = 0;
 }

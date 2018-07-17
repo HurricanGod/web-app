@@ -41,6 +41,10 @@ public @interface WriteCache {
      */
     String postfixKey() default "";
 
+
+    int enterQueueWay() default CacheConstant.RPUSH;
+
+
     double score() default 0;
 
     int index() default 0;

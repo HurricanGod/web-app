@@ -63,9 +63,9 @@ public class WriteCacheAspect {
                     System.out.println(annotation.annotationType().equals(KeyParam.class));
                     if (annotation.annotationType().equals(KeyParam.class)) {
                         key = key.replace(((KeyParam) annotation).value(), params[i].toString());
-                    }else if( annotation.annotationType().equals(CacheValue.class) ){
+                    } else if (annotation.annotationType().equals(CacheValue.class)) {
                         cacheValue = params[i];
-                    }else if( annotation.annotationType().equals(HashField.class) ){
+                    } else if (annotation.annotationType().equals(HashField.class)) {
                         field = params[i].toString();
                     }
                 }
@@ -79,7 +79,10 @@ public class WriteCacheAspect {
                     cacheString(args, key, cacheValue);
                     break;
                 case KeyType.HASH:
-                    cacheObject(args, key, cacheValue, field);
+                    cacheObjectToHash(args, key, cacheValue, field);
+                    break;
+                case KeyType.LIST:
+                    cacheObjectToList(args, key, cacheValue);
                     break;
                 default:
                     break;
@@ -95,18 +98,52 @@ public class WriteCacheAspect {
         return execResult;
     }
 
-    private void cacheObject(WriteCache args, String key, Object cacheValue, String field) {
+    private void cacheObjectToSet(WriteCache args, String key, Object cacheValue){
+        executor.doInRedis(instance -> {
+
+        });
+    }
+
+    private void cacheObjectToList(WriteCache args, String key, Object cacheValue) {
+        executor.doInRedis(instance -> {
+            if (cacheValue == null) {
+                return;
+            }
+            Boolean existHashKey = instance.exists(key);
+            if (isJavaBasicType(cacheValue)) {
+                if (args.enterQueueWay() == CacheConstant.RPUSH) {
+                    instance.rpush(key, cacheValue.toString());
+                } else {
+                    instance.lpush(key, cacheValue.toString());
+                }
+            } else {
+                ObjectMapper mapper = new ObjectMapper();
+                String valueString = mapper.writeValueAsString(cacheValue);
+                if (args.enterQueueWay() == CacheConstant.RPUSH) {
+                    instance.rpush(key, valueString);
+                } else {
+                    instance.lpush(key, valueString);
+                }
+            }
+            if (!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
+                instance.expire(key, args.expire());
+            }
+        });
+    }
+
+    private void cacheObjectToHash(WriteCache args, String key, Object cacheValue, String field) {
         executor.doInRedis(instance -> {
             Boolean existHashKey = instance.exists(key);
-            if(field != null && cacheValue != null){
-                if(isJavaBasicType(cacheValue)){
+            if (field != null && cacheValue != null) {
+                if (isJavaBasicType(cacheValue)) {
                     instance.hset(key, field, cacheValue.toString());
-                }else{
+
+                } else {
                     ObjectMapper mapper = new ObjectMapper();
                     String valueString = mapper.writeValueAsString(cacheValue);
                     instance.hset(key, field, valueString);
                 }
-                if(!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE){
+                if (!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
                     instance.expire(key, args.expire());
                 }
             }
@@ -118,20 +155,20 @@ public class WriteCacheAspect {
                 args.type() == KeyType.INT_STRING || args.type() == KeyType.DOUBLE_STRING ? "0" : "null"
                 : cacheValue.toString();
         executor.doInRedis(instance -> {
-            if(args.expire() != CacheConstant.NEVER_EXPIRE){
+            if (args.expire() != CacheConstant.NEVER_EXPIRE) {
                 instance.setex(key, args.expire(), value);
-            }else{
+            } else {
                 instance.set(key, value);
             }
         });
     }
 
-    private boolean isJavaBasicType(Object cacheValue){
-        if(cacheValue instanceof Number){
+    private boolean isJavaBasicType(Object cacheValue) {
+        if (cacheValue instanceof Number) {
             return true;
-        }else if( cacheValue instanceof String ){
+        } else if (cacheValue instanceof String) {
             return true;
-        }else if( cacheValue instanceof Character ){
+        } else if (cacheValue instanceof Character) {
             return true;
         }
         return false;
