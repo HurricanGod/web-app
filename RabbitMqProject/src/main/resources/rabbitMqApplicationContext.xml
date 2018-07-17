@@ -9,6 +9,10 @@
                 <value>classpath*:*rabbitmq.properties</value>
             </list>
         </property>
+        <property name="fileEncoding">
+            <value>UTF-8</value>
+        </property>
     </bean>
     <import resource="spring-rabbitmq.xml"/>
+    <import resource="spring-service.xml"/>
 </beans>
