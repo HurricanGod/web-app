@@ -12,6 +12,7 @@ public class SaveOutLogListener implements ChannelAwareMessageListener {
 
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
+        System.out.println("exec SaveOutLogListener.onMessage()");
         System.out.println(message.toString());
         logger.info("消费消息：{}", message.toString());
 

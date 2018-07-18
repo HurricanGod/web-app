@@ -19,6 +19,6 @@ public class RabbitMqStartTest {
     @Test
     public void testSimpleMessageQueue() {
         UniqueKeyElement element = UniqueKeyElement.build().aidIs(1).openidIs("Hurrican");
-        producerService.sendData("hello", element);
+        producerService.sendData("save_out_log_key", element);
     }
 }
