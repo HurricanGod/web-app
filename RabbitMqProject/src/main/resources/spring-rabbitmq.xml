@@ -18,28 +18,37 @@
                                port="${rabbit.port}"/>
     <rabbit:admin connection-factory="connectionFactory"/>
 
-    <!-- queue 队列声明
-         durable：true、false true：在服务器重启时，能够存活
-         exclusive ：是否为当前连接的专用队列，在连接断开后，会自动删除该队列
-         autodelete：当没有任何消费者使用时，自动删除该队列
+    <!--
+        queue 队列声明
+         durable：true → 是否持久化
+         auto-delete：当没有任何消费者使用时，自动删除该队列
+         exclusive ：是否为当前连接的专用队列，只能由创建者使用，在连接断开后，会自动删除该队列
     -->
-    <!-- 对外接口保存日志队列 -->
+    <!-- 创建名为 save_out_log 的消息队列 -->
     <rabbit:queue id="save_out_log" durable="true" auto-delete="false"
                   exclusive="false" name="save_out_log"/>
 
 
     <!-- exchange queue binging key 绑定 -->
-    <rabbit:direct-exchange name="mq-exchange"
-                            durable="true" auto-delete="false" id="mq-exchange">
+    <rabbit:direct-exchange name="mq-exchange" durable="true"
+                            auto-delete="false" id="mq-exchange">
         <rabbit:bindings>
             <rabbit:binding queue="save_out_log" key="save_out_log_key"/>
-
         </rabbit:bindings>
     </rabbit:direct-exchange>
+    <!--
+        监听对外接口保存日志队列
+        acknowledge="manual" 设置确认消息为手动模式
+    -->
+    <rabbit:listener-container connection-factory="connectionFactory"
+                               acknowledge="manual" transaction-size="5">
+        <rabbit:listener queues="save_out_log" ref="saveOutLogListener"/>
+        <rabbit:listener queues="save_out_log" ref="exceptionListener"/>
+    </rabbit:listener-container>
 
     <!--
-        spring amqp默认的是jackson 的一个插件,目的将生产者生产的数据转换为json存入消息队列.
-        由于fastjson的速度快于jackson,这里替换为fastjson的一个实现
+      spring amqp默认的是jackson 的一个插件,目的将生产者生产的数据转换为json存入消息队列.
+      由于fastjson的速度快于jackson,这里替换为fastjson的一个实现
     -->
     <bean id="jsonMessageConverter" class="cn.hurrican.rabbitmq.project.utils.FastJsonMessageConverter">
 
@@ -49,19 +58,4 @@
     <rabbit:template exchange="mq-exchange" id="amqpTemplate"
                      connection-factory="connectionFactory"
                      message-converter="jsonMessageConverter"/>
-
-    <!-- 监听器 -->
-    <bean id="saveOutLogListener" class="cn.hurrican.rabbitmq.project.service.SaveOutLogListener">
-
-    </bean>
-
-
-    <!--  
-        监听对外接口保存日志队列
-        acknowledge="manual" 设置确认消息为手动模式
-    -->
-    <rabbit:listener-container
-            connection-factory="connectionFactory" acknowledge="manual" transaction-size="5">
-        <rabbit:listener queues="save_out_log" ref="saveOutLogListener"/>
-    </rabbit:listener-container>
 </beans>

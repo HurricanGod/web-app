@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Random;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:rabbitMqApplicationContext.xml")
 public class RabbitMqStartTest {
@@ -17,8 +19,12 @@ public class RabbitMqStartTest {
     private ProducerService producerService;
 
     @Test
-    public void testSimpleMessageQueue() {
+    public void testSimpleMessageQueue() throws InterruptedException {
         UniqueKeyElement element = UniqueKeyElement.build().aidIs(1).openidIs("Hurrican");
-        producerService.sendData("save_out_log_key", element);
+        Random random = new Random();
+        for (int i = 0; i < 1000; i++) {
+            producerService.sendData("save_out_log_key", element);
+            Thread.sleep(random.nextInt(1000));
+        }
     }
 }
