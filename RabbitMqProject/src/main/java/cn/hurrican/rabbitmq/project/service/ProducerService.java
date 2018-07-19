@@ -15,4 +15,7 @@ public class ProducerService {
     }
 
 
+    public void sendDateToExchange(String exchangeName, Object obj) {
+        amqpTemplate.convertAndSend(exchangeName, null, obj);
+    }
 }

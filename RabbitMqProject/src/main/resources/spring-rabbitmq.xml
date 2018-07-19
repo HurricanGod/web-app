@@ -29,11 +29,18 @@
                   exclusive="false" name="save_out_log"/>
 
 
+    <rabbit:queue id="exceptionLogQueue" name="exceptionLogQueue" auto-delete="false"
+                  exclusive="true" durable="false"/>
+
+    <rabbit:queue id="infoLogQueue" name="infoLogQueue" auto-delete="false"
+                  exclusive="true" durable="false"/>
+
     <!-- exchange queue binging key 绑定 -->
     <rabbit:direct-exchange name="mq-exchange" durable="true"
                             auto-delete="false" id="mq-exchange">
         <rabbit:bindings>
             <rabbit:binding queue="save_out_log" key="save_out_log_key"/>
+            <rabbit:binding queue="exceptionLogQueue" key="exceptionLogRouteKey"/>
         </rabbit:bindings>
     </rabbit:direct-exchange>
     <!--
@@ -43,7 +50,7 @@
     <rabbit:listener-container connection-factory="connectionFactory"
                                acknowledge="manual" transaction-size="5">
         <rabbit:listener queues="save_out_log" ref="saveOutLogListener"/>
-        <rabbit:listener queues="save_out_log" ref="exceptionListener"/>
+        <rabbit:listener queues="exceptionLogQueue" ref="exceptionListener"/>
     </rabbit:listener-container>
 
     <!--
@@ -53,6 +60,14 @@
     <bean id="jsonMessageConverter" class="cn.hurrican.rabbitmq.project.utils.FastJsonMessageConverter">
 
     </bean>
+
+    <rabbit:fanout-exchange name="fanoutExchange" durable="false"
+                            auto-delete="true" id="fanoutExchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="infoLogQueue">
+            </rabbit:binding>
+        </rabbit:bindings>
+    </rabbit:fanout-exchange>
 
     <!-- spring template声明 -->
     <rabbit:template exchange="mq-exchange" id="amqpTemplate"
