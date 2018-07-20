@@ -30,10 +30,10 @@
 
 
     <rabbit:queue id="exceptionLogQueue" name="exceptionLogQueue" auto-delete="false"
-                  exclusive="true" durable="false"/>
+                  exclusive="false" durable="true"/>
 
     <rabbit:queue id="infoLogQueue" name="infoLogQueue" auto-delete="false"
-                  exclusive="true" durable="false"/>
+                  exclusive="false" durable="true"/>
 
     <!-- exchange queue binging key 绑定 -->
     <rabbit:direct-exchange name="mq-exchange" durable="true"
@@ -41,6 +41,7 @@
         <rabbit:bindings>
             <rabbit:binding queue="save_out_log" key="save_out_log_key"/>
             <rabbit:binding queue="exceptionLogQueue" key="exceptionLogRouteKey"/>
+
         </rabbit:bindings>
     </rabbit:direct-exchange>
     <!--
@@ -65,6 +66,9 @@
                             auto-delete="true" id="fanoutExchange">
         <rabbit:bindings>
             <rabbit:binding queue="infoLogQueue">
+            </rabbit:binding>
+
+            <rabbit:binding queue="exceptionLogQueue">
             </rabbit:binding>
         </rabbit:bindings>
     </rabbit:fanout-exchange>
