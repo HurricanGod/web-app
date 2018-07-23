@@ -25,7 +25,8 @@ public class AwardMessageListener implements ChannelAwareMessageListener {
         String json = new String(message.getBody());
         logger.info("消费消息：{}", json);
 
-        // 确认消息被消费了
+        // 确认消息被消费了, MessageProperties.getDeliveryTag() 是 Tag 的 id，由生产者生成
+        // 第二个 boolean 参数：false 表示当前一个消息收到， true 表示确认所有 consumer 收到消息了
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
         logger.info("消费完消息向服务端发送消费完成确认");
     }

@@ -48,7 +48,7 @@ public class RabbitMqStartTest {
         for (int i = 0; i < 20; i++) {
             msg.setRetCode(i);
             if (i % 2 == 0) {
-                producerService.sendDataToTopicExchange("topic_exchange", msg, "awardRecord.abc.log");
+                producerService.sendDataToTopicExchange("topic_exchange", msg, "awardRecord.abc");
             } else {
                 producerService.sendDataToTopicExchange("topic_exchange", msg, "awardRecord.hello.log");
             }
