@@ -5,10 +5,13 @@ import cn.hurrican.rabbitmq.consumer.service.PublishSubscribeService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 /**
  * @Author: Hurrican
@@ -30,6 +33,9 @@ public class RabbitMqConsumerTest {
     @Qualifier(value = "infoLogListener")
     private InfoLogQueueListener infoLogQueueListener;
 
+    @Autowired
+    private List<ChannelAwareMessageListener> list;
+
     @Test
     public void testConsume() throws InterruptedException {
         Thread.sleep(15000);
@@ -39,6 +45,10 @@ public class RabbitMqConsumerTest {
 
     @Test
     public void testFanoutConsume() throws InterruptedException {
+        if (list != null) {
+            System.out.println("list.size() = " + list.size());
+            list.forEach(l -> System.out.println(l.getClass()));
+        }
         Thread.sleep(15000);
         System.out.println("finish.........");
     }
