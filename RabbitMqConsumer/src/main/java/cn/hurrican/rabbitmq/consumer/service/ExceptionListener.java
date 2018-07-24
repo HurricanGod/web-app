@@ -1,7 +1,5 @@
 package cn.hurrican.rabbitmq.consumer.service;
 
-import cn.hurrican.model.UniqueKeyElement;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,10 +16,7 @@ public class ExceptionListener implements ChannelAwareMessageListener {
     public void onMessage(Message message, Channel channel) throws Exception {
         System.out.println("exec ExceptionListener.onMessage()...");
         String json = new String(message.getBody());
-        ObjectMapper objectMapper = new ObjectMapper();
-        UniqueKeyElement uniqueKeyElement = objectMapper.readValue(json, UniqueKeyElement.class);
-        System.out.println("uniqueKeyElement = " + uniqueKeyElement);
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-        logger.info("消费完消息向服务端发送消费完成确认");
+        logger.info("异常日志消费者消费信息：{}", json);
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
     }
 }

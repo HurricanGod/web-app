@@ -1,6 +1,8 @@
 package cn.hurrican.rabbitmq.consumer.config;
 
 import cn.hurrican.rabbitmq.consumer.service.ExceptionListener;
+import cn.hurrican.rabbitmq.consumer.service.InfoLogQueueListener;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
@@ -13,6 +15,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
+/**
+ * @Author: Hurrican
+ * @Description:
+ * @Date 2018/7/23
+ * @Modified 11:00
+ */
 @Configuration
 @PropertySource(value = "classpath:rabbitmq.properties")
 public class FanoutConsumerConfig {
@@ -52,10 +60,27 @@ public class FanoutConsumerConfig {
 
 
     @Bean
-    public SimpleMessageListenerContainer getLogListenerContainer(ConnectionFactory cachingConnectionFactory,
-                                                                  ExceptionListener exceptionListener) {
+    public SimpleMessageListenerContainer infoLogConsumerListenerContainer(ConnectionFactory cachingConnectionFactory,
+                                                                           InfoLogQueueListener infoLogListener, Queue infoQueue) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(cachingConnectionFactory);
+        container.setMessageListener(infoLogListener);
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        container.setQueues(infoQueue);
+        container.setConcurrentConsumers(2);
+        container.setMaxConcurrentConsumers(5);
+        return container;
+    }
+
+
+    @Bean
+    public SimpleMessageListenerContainer exceptionLogConsumerListenerContainer(ConnectionFactory cachingConnectionFactory,
+                                                                                ExceptionListener exceptionListener, Queue exceptionQueue) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(cachingConnectionFactory);
+        container.setConcurrentConsumers(2);
+        container.setMaxConcurrentConsumers(5);
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setMessageListener(exceptionListener);
+        container.setQueues(exceptionQueue);
         return container;
     }
 

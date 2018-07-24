@@ -1,26 +1,25 @@
 package cn.hurrican.rabbitmq.consumer.config;
 
-import cn.hurrican.rabbitmq.consumer.service.ExceptionListener;
-import cn.hurrican.rabbitmq.consumer.utils.FastJsonMessageConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.core.AcknowledgeMode;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.support.RetryTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +45,6 @@ public class TopicConsumerConfig {
                 true, false, false);
     }
 
-    // precondition_failed
     @Bean(name = "persistenceQueueForLog")
     Queue getPersistenceQueueForLog(){
         return new Queue(env.getProperty("rabbitmq.persistence.queue.for.log"),
@@ -83,21 +81,16 @@ public class TopicConsumerConfig {
 
         container.setMessageListener(awardMessageListener);
         String queueString = env.getProperty("rabbitmq.topic.pattern.listen.queue.list");
-        Queue[] itemQueue = new Queue[queues.length];
-        int index = 0;
+        List<Queue> itemQueueList = new ArrayList<>(queues.length);
         if(queueString != null){
             String[] queueNameArray = queueString.split(",");
             if(queueNameArray.length > 0 && queues.length > 0){
                 Set<String> itemQueueNameSet = Arrays.stream(queueNameArray).collect(Collectors.toSet());
-                for (int i = 0; i < queues.length; i++) {
-                    logger.info("queue.name = {}", queues[i].getName());
-                    if(itemQueueNameSet.contains(queues[i].getName())){
-                        itemQueue[index++] = queues[i];
-                    }
-                }
+                itemQueueList = Arrays.stream(queues).filter(q -> itemQueueNameSet.contains(q.getName())).collect(Collectors.toList());
             }
         }
-        container.setQueues(itemQueue);
+        Queue[] itemQueue = new Queue[itemQueueList.size()];
+        container.setQueues(itemQueueList.toArray(itemQueue));
         container.setConsumerArguments(Collections.singletonMap("x-priority", 10));
         Integer concurrentConsumers = env.getProperty("rabbitmq.concurrent.consumer.count", Integer.class, 2);
         container.setConcurrentConsumers(concurrentConsumers);

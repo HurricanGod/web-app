@@ -29,10 +29,10 @@
                   exclusive="false" name="save_out_log"/>
 
 
-    <rabbit:queue id="exceptionLogQueue" name="exceptionLogQueue" auto-delete="false"
+    <rabbit:queue id="exception_queue" name="exception_queue" auto-delete="false"
                   exclusive="false" durable="true"/>
 
-    <rabbit:queue id="infoLogQueue" name="infoLogQueue" auto-delete="false"
+    <rabbit:queue id="info_queue" name="info_queue" auto-delete="false"
                   exclusive="false" durable="true"/>
 
     <rabbit:queue id="for_award_queue" name="for_award_queue" auto-delete="false"
@@ -46,8 +46,6 @@
                             auto-delete="false" id="mq-exchange">
         <rabbit:bindings>
             <rabbit:binding queue="save_out_log" key="save_out_log_key"/>
-            <rabbit:binding queue="exceptionLogQueue" key="exceptionLogRouteKey"/>
-
         </rabbit:bindings>
     </rabbit:direct-exchange>
 
@@ -56,17 +54,14 @@
       spring amqp默认的是jackson 的一个插件,目的将生产者生产的数据转换为json存入消息队列.
       由于fastjson的速度快于jackson,这里替换为fastjson的一个实现
     -->
-    <bean id="jsonMessageConverter" class="cn.hurrican.rabbitmq.producer.utils.FastJsonMessageConverter">
+    <bean id="jsonMessageConverter" class="cn.hurrican.rabbitmq.producer.utils.FastJsonMessageConverter" />
 
-    </bean>
-
-    <rabbit:fanout-exchange name="fanoutExchange" durable="false"
-                            auto-delete="true" id="fanoutExchange">
+    <rabbit:fanout-exchange name="log_fanout_exchange" durable="true"
+                            auto-delete="false" id="fanoutExchange">
         <rabbit:bindings>
-            <rabbit:binding queue="infoLogQueue">
+            <rabbit:binding queue="info_queue">
             </rabbit:binding>
-
-            <rabbit:binding queue="exceptionLogQueue">
+            <rabbit:binding queue="exception_queue">
             </rabbit:binding>
         </rabbit:bindings>
     </rabbit:fanout-exchange>
@@ -79,7 +74,5 @@
     </rabbit:topic-exchange>
 
     <!-- spring template声明 -->
-    <rabbit:template exchange="mq-exchange" id="amqpTemplate"
-                     connection-factory="connectionFactory"
-                     message-converter="jsonMessageConverter"/>
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" message-converter="jsonMessageConverter"/>
 </beans>

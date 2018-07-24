@@ -7,22 +7,25 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.stereotype.Service;
 
-@Service("saveOutLogListener")
-public class SaveOutLogListener implements ChannelAwareMessageListener {
+/**
+ * @author Hurrican
+ */
+@Service("infoLogListener")
+public class InfoLogQueueListener implements ChannelAwareMessageListener {
 
-    private static Logger logger = LogManager.getLogger(SaveOutLogListener.class);
+    private static Logger logger = LogManager.getLogger(InfoLogQueueListener.class);
 
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
-        System.out.println("exec SaveOutLogListener.onMessage()");
-        System.out.println(message.toString());
-        logger.info("消费消息：{}", message.toString());
+        System.out.println("exec InfoLogQueueListener.onMessage()");
 
         // 接收信息
         String json = new String(message.getBody());
+        logger.info("消费消息：{}", json);
+        System.out.println("消费消息："  + json);
 
         // 确认消息被消费了
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         logger.info("消费完消息向服务端发送消费完成确认");
     }
 }

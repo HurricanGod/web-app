@@ -34,10 +34,13 @@ public class RabbitMqStartTest {
     public void testPublishSubscribeMsgQueue() throws InterruptedException {
         UniqueKeyElement element = UniqueKeyElement.build().aidIs(1).openidIs("Hurrican");
         Random random = new Random();
+        Integer millis = 0;
         for (int i = 0; i < 10; i++) {
             element.setPlatformId(i);
-            producerService.sendDataToFontOutExchange("fanoutExchange", element.platformIdIs(i));
-            Thread.sleep(random.nextInt(1000));
+            producerService.sendDataToFontOutExchange("fanout1", element.platformIdIs(i));
+            millis = random.nextInt(1000);
+            System.out.println("sleep ${sec} ms".replace("${sec}", millis.toString()));
+            Thread.sleep(millis);
         }
     }
 

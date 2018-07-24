@@ -1,11 +1,13 @@
 package cn.hurrican.rabbitmq.consumer.config;
 
 import cn.hurrican.rabbitmq.consumer.utils.FastJsonMessageConverter;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
+
+/**
+ * @Author: Hurrican
+ * @Description:
+ * @Date 2018/7/23
+ * @Modified 11:00
+ */
 @Configuration
 @PropertySource(value = "classpath:rabbitmq.properties")
 public class ConsumerBaseConfig {
@@ -23,12 +32,13 @@ public class ConsumerBaseConfig {
 
 
     @Bean(name = "cachingConnectionFactory")
-    ConnectionFactory initConnectionFactory() {
+    CachingConnectionFactory initConnectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setHost(env.getProperty("rabbit.hosts"));
         connectionFactory.setPort(env.getProperty("rabbit.port", Integer.class));
         connectionFactory.setUsername(env.getProperty("rabbit.username"));
         connectionFactory.setPassword(env.getProperty("rabbit.password"));
+        connectionFactory.setVirtualHost(env.getProperty("rabbit.virtual.host"));
         return connectionFactory;
 
     }
@@ -62,6 +72,17 @@ public class ConsumerBaseConfig {
         rabbitTemplate.setRetryTemplate(retryTemplate);
         rabbitTemplate.setMessageConverter(jsonMessageConverter);
         return rabbitTemplate;
+    }
+
+
+    @Bean(name = "basicListenerContainer")
+    public SimpleMessageListenerContainer getBasicMessageListenerContainer(ConnectionFactory cachingConnectionFactory,
+                                                                           FastJsonMessageConverter jsonMessageConverter){
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(cachingConnectionFactory);
+        container.setMessageConverter(jsonMessageConverter);
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        return container;
     }
 
 
