@@ -64,8 +64,8 @@ public class FanoutConsumerConfig {
                                                                            InfoLogQueueListener infoLogListener, Queue infoQueue) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(cachingConnectionFactory);
         container.setMessageListener(infoLogListener);
-        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setQueues(infoQueue);
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setConcurrentConsumers(2);
         container.setMaxConcurrentConsumers(5);
         return container;
