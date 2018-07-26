@@ -10,7 +10,11 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Author: Hurrican
@@ -112,9 +116,6 @@ public class TestMethod {
     }
 
 
-    @Test
-    public void testMethod6(){
 
-    }
 
 }

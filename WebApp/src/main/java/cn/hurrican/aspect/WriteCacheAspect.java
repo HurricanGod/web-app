@@ -4,10 +4,16 @@ import cn.hurrican.annotation.CacheValue;
 import cn.hurrican.annotation.HashField;
 import cn.hurrican.annotation.KeyParam;
 import cn.hurrican.annotation.WriteCache;
+import cn.hurrican.config.AbstractHostingCacheHandler;
+import cn.hurrican.config.CacheBean;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
+import cn.hurrican.exception.RedisKeyMismatchRuntimeException;
 import cn.hurrican.redis.RedisExecutor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +24,12 @@ import org.springframework.stereotype.Component;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +41,8 @@ import java.util.stream.Collectors;
 @Aspect
 @Component
 public class WriteCacheAspect {
+
+    private static Logger logger = LogManager.getLogger(WriteCacheAspect.class);
 
     @Autowired
     private RedisExecutor executor;
@@ -43,7 +56,7 @@ public class WriteCacheAspect {
     @Around("cacheValue() && @annotation(args)")
     public Object doCache(ProceedingJoinPoint joinPoint, WriteCache args) {
 
-
+        boolean hadWritten = false;
         String methodInvokeName = joinPoint.getSignature().toLongString();
         List<Method> itemMethod = Arrays.stream(joinPoint.getTarget().getClass().getDeclaredMethods())
                 .filter(e -> e.toString().equals(methodInvokeName))
@@ -54,8 +67,7 @@ public class WriteCacheAspect {
         if (itemMethod.size() > 0) {
             Method method = itemMethod.get(0);
             String key = args.prefixKey() + args.postfixKey();
-            Object cacheValue = null;
-            String field = null;
+            CacheBean cacheBean = CacheBean.build();
             Annotation[][] methodParameterAnnotations = method.getParameterAnnotations();
             for (int i = 0; i < methodParameterAnnotations.length; i++) {
                 for (int j = 0; j < methodParameterAnnotations[i].length; j++) {
@@ -64,28 +76,33 @@ public class WriteCacheAspect {
                     if (annotation.annotationType().equals(KeyParam.class)) {
                         key = key.replace(((KeyParam) annotation).value(), params[i].toString());
                     } else if (annotation.annotationType().equals(CacheValue.class)) {
-                        cacheValue = params[i];
+                        cacheBean.setValue(params[i]);
+                        cacheBean.setType(((CacheValue)annotation).type());
+
                     } else if (annotation.annotationType().equals(HashField.class)) {
-                        field = params[i].toString();
+                        cacheBean.setField(params[i].toString());
                     }
                 }
             }
 
             System.out.println("key.toString() = " + key);
-            switch (args.type()) {
-                case KeyType.INT_STRING:
-                case KeyType.DOUBLE_STRING:
-                case KeyType.CHAR_STRING:
-                    cacheString(args, key, cacheValue);
-                    break;
-                case KeyType.HASH:
-                    cacheObjectToHash(args, key, cacheValue, field);
-                    break;
-                case KeyType.LIST:
-                    cacheObjectToList(args, key, cacheValue);
-                    break;
-                default:
-                    break;
+            if(args.writeOccasion() == CacheConstant.BEFORE){
+                switch (args.type()) {
+                    case KeyType.INT_STRING:
+                    case KeyType.DOUBLE_STRING:
+                    case KeyType.CHAR_STRING:
+                        cacheString(args, key, cacheBean);
+                        break;
+                    case KeyType.HASH:
+                        cacheObjectToHash(args, key, cacheBean);
+                        break;
+                    case KeyType.LIST:
+                        cacheObjectToList(args, key, cacheBean);
+                        break;
+                    default:
+                        break;
+                }
+                hadWritten = true;
             }
         }
 
@@ -95,34 +112,88 @@ public class WriteCacheAspect {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+
         return execResult;
     }
 
-    private void cacheObjectToSet(WriteCache args, String key, Object cacheValue){
+    private void cacheObjectToSet(WriteCache args, String key, CacheBean cacheBean, AbstractHostingCacheHandler handler){
         executor.doInRedis(instance -> {
-
+            if (cacheBean.getValue() == null) {
+                return;
+            }
+            // 判断 set key 是否存在，方便后面设置过期时间
+            Boolean existSetKey = instance.exists(key);
+            // 删除写模式下先删除 key 在保存
+            if(args.pattern() == CacheConstant.DEL_WRITE){
+                instance.del(key);
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            // 判断 cacheBean 中的 value 是否为集合类型
+            if(isCollectionType(cacheBean)){
+                Collection collection = (Collection) cacheBean.getValue();
+                String[] valueArray = new String[collection.size()];
+                int index = 0;
+                for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
+                    Object object = iterator.next();
+                    valueArray[index++] = mapper.writeValueAsString(object);
+                }
+                instance.sadd(key, valueArray);
+            }else{
+                instance.sadd(key, mapper.writeValueAsString(cacheBean.getValue()));
+            }
+            if (!existSetKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
+                instance.expire(key, args.expire());
+            }else{
+                handler.handleNeverExpireKey(key);
+            }
         });
     }
 
-    private void cacheObjectToList(WriteCache args, String key, Object cacheValue) {
+    /**
+     * 判断要缓存的对象是否是集合类型
+     * @param cacheBean
+     * @return
+     */
+    private Boolean isCollectionType(CacheBean cacheBean) {
+        return Optional.ofNullable(cacheBean.getType())
+                        .map(e -> Arrays.stream(e.getInterfaces()).collect(Collectors.toSet()).contains(Collection.class))
+                        .orElse(false);
+    }
+
+    private void cacheObjectToList(WriteCache args, String key, CacheBean cacheBean) {
         executor.doInRedis(instance -> {
-            if (cacheValue == null) {
+            if (cacheBean.getValue() == null) {
                 return;
             }
             Boolean existHashKey = instance.exists(key);
-            if (isJavaBasicType(cacheValue)) {
-                if (args.enterQueueWay() == CacheConstant.RPUSH) {
-                    instance.rpush(key, cacheValue.toString());
-                } else {
-                    instance.lpush(key, cacheValue.toString());
+            if(args.pattern() == CacheConstant.DEL_WRITE){
+                instance.del(key);
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            // 要缓存的值为集合类型
+            if(isCollectionType(cacheBean)){
+                Collection collection = (Collection) cacheBean.getValue();
+                int index = 0;
+                String[] valueArray = new String[collection.size()];
+                // 将集合对象转化为 String 数组
+                for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
+                   try{
+                       Object object = iterator.next();
+                       valueArray[index++] = mapper.writeValueAsString(object);
+                   }catch( Exception e){
+                       logger.error(e);
+                   }
                 }
-            } else {
-                ObjectMapper mapper = new ObjectMapper();
-                String valueString = mapper.writeValueAsString(cacheValue);
                 if (args.enterQueueWay() == CacheConstant.RPUSH) {
-                    instance.rpush(key, valueString);
+                    instance.rpush(key, valueArray);
                 } else {
-                    instance.lpush(key, valueString);
+                    instance.lpush(key, valueArray);
+                }
+            }else{
+                if (args.enterQueueWay() == CacheConstant.RPUSH) {
+                    instance.rpush(key, mapper.writeValueAsString(cacheBean.getValue()));
+                } else {
+                    instance.lpush(key, mapper.writeValueAsString(cacheBean.getValue()));
                 }
             }
             if (!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
@@ -131,29 +202,53 @@ public class WriteCacheAspect {
         });
     }
 
-    private void cacheObjectToHash(WriteCache args, String key, Object cacheValue, String field) {
+    private void cacheObjectToHash(WriteCache args, String key, CacheBean cacheBean) {
         executor.doInRedis(instance -> {
             Boolean existHashKey = instance.exists(key);
-            if (field != null && cacheValue != null) {
-                if (isJavaBasicType(cacheValue)) {
-                    instance.hset(key, field, cacheValue.toString());
-
-                } else {
-                    ObjectMapper mapper = new ObjectMapper();
-                    String valueString = mapper.writeValueAsString(cacheValue);
-                    instance.hset(key, field, valueString);
+            if(isMapType(cacheBean.getType())){
+                instance.hmset(key, convertToMap(cacheBean));
+            }else{
+                if (cacheBean.getField() != null && cacheBean.getValue() != null) {
+                    if (isJavaBasicType(cacheBean.getValue())) {
+                        instance.hset(key, cacheBean.getField(), cacheBean.getValue().toString());
+                    } else {
+                        ObjectMapper mapper = new ObjectMapper();
+                        String valueString = mapper.writeValueAsString(cacheBean.getValue());
+                        instance.hset(key, cacheBean.getField(), valueString);
+                    }
+                }else{
+                    throw new RedisKeyMismatchRuntimeException("往 hash 存储结构里缓存1个字段时，field 和 value都不允许为 null");
                 }
-                if (!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
-                    instance.expire(key, args.expire());
-                }
+            }
+            if (!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
+                instance.expire(key, args.expire());
             }
         });
     }
 
-    private void cacheString(WriteCache args, String key, Object cacheValue) {
-        String value = cacheValue == null ?
+    private Map<String, String> convertToMap(CacheBean cacheBean){
+        HashMap<String, String> map = new HashMap<>(16);
+        Object value = cacheBean.getValue();
+        ObjectMapper mapper = new ObjectMapper();
+        if(value instanceof Map){
+            ((Map) value).forEach((k,v) ->{
+                try {
+                    map.put(mapper.writeValueAsString(k), mapper.writeValueAsString(v));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    logger.error("convertToMap()方法发生异常：" + e);
+                }
+            });
+        }
+        return map;
+    }
+
+
+
+    private void cacheString(WriteCache args, String key, CacheBean cacheBean) {
+        String value = cacheBean.getValue() == null ?
                 args.type() == KeyType.INT_STRING || args.type() == KeyType.DOUBLE_STRING ? "0" : "null"
-                : cacheValue.toString();
+                : cacheBean.getValue().toString();
         executor.doInRedis(instance -> {
             if (args.expire() != CacheConstant.NEVER_EXPIRE) {
                 instance.setex(key, args.expire(), value);
@@ -172,5 +267,15 @@ public class WriteCacheAspect {
             return true;
         }
         return false;
+    }
+
+    private boolean isMapType(Class clazz){
+        if(clazz == null){
+            return false;
+        }
+        if(clazz.equals(Map.class)){
+            return true;
+        }
+        return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toSet()).contains(Map.class);
     }
 }

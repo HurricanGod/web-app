@@ -45,11 +45,9 @@ public @interface WriteCache {
     int enterQueueWay() default CacheConstant.RPUSH;
 
 
-    double score() default 0;
+    int pattern() default CacheConstant.DEL_WRITE;
 
-    int index() default 0;
+    /** 写缓存时机，种类有：被代理方法执行前写入缓存 or 被代理方法执行后写入缓存 **/
+    int writeOccasion() default CacheConstant.BEFORE;
 
-    String field() default CacheConstant.UNDEFINED_NAME;
-
-    String[] fields() default {};
 }
