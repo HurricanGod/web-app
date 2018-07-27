@@ -45,7 +45,8 @@ public @interface WriteCache {
     int enterQueueWay() default CacheConstant.RPUSH;
 
 
-    int pattern() default CacheConstant.DEL_WRITE;
+    /** 写缓存的模式，默认追加（主要与集合类型的 key 相关） **/
+    int pattern() default CacheConstant.APPEND_WRITE;
 
     /** 写缓存时机，种类有：被代理方法执行前写入缓存 or 被代理方法执行后写入缓存 **/
     int writeOccasion() default CacheConstant.BEFORE;

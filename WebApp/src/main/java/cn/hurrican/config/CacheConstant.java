@@ -27,4 +27,9 @@ public interface CacheConstant {
 
     /** 增强后写入缓存 **/
     int AFTER = 1;
+
+    int LEFT_INDEX = 0;
+
+    int RIGHT_INDEX = -1;
+
 }

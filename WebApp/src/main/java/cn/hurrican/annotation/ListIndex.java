@@ -1,5 +1,7 @@
 package cn.hurrican.annotation;
 
+import cn.hurrican.config.CacheConstant;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,5 +18,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Documented
 public @interface ListIndex {
-    boolean rightPush() default true;
+
+    /**  **/
+    int lindexType() default CacheConstant.LEFT_INDEX;
+
+
 }

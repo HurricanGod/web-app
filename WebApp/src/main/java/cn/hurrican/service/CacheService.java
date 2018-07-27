@@ -2,9 +2,11 @@ package cn.hurrican.service;
 
 import cn.hurrican.annotation.CacheValue;
 import cn.hurrican.annotation.KeyParam;
+import cn.hurrican.annotation.ReadCache;
 import cn.hurrican.annotation.WriteCache;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
+import cn.hurrican.model.Entry;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,11 +31,17 @@ public class CacheService {
                                   @KeyParam("platformId")Integer platformId){
 
     }
-    @WriteCache(type = KeyType.LIST, prefixKey = "type:list:",
-            postfixKey = "aid:platformId", pattern = CacheConstant.APPEND_WRITE)
+    @WriteCache(type = KeyType.LIST, prefixKey = "type:list:", postfixKey = "aid:platformId", pattern = CacheConstant.DEL_WRITE)
     public void cacheList(@KeyParam("platformId")Integer platformId,
                           @KeyParam("aid") Integer aid,
-                          @CacheValue(type = List.class)List<String> value){
+                          @CacheValue(type = List.class)List<Entry> value){
 
+    }
+
+
+    @ReadCache(type = KeyType.LIST, prefixKey = "type:list:", postfixKey = "aid:platformId", valueClazz = Entry.class)
+    public List<Entry> readCacheValue(@KeyParam("platformId")Integer platformId,@KeyParam("aid") Integer aid){
+
+        return null;
     }
 }

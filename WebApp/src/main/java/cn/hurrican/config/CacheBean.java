@@ -16,10 +16,14 @@ import lombok.experimental.Accessors;
 public class CacheBean {
 
 
+    /** 缓存对象类型 **/
     private Class type;
     private Object value;
     private String field;
     private Double scores;
+
+    private Integer lindex;
+    private Integer rindex;
 
     public static CacheBean build(){
         return new CacheBean();

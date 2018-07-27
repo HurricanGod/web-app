@@ -16,4 +16,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Documented
 public @interface HashField {
+    Class clazz() default String.class;
 }
