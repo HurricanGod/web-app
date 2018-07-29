@@ -53,6 +53,8 @@ public class TestCacheController {
         value.add(new Entry<>("1", "abc"));
         value.add(new Entry<>("2", "abd"));
         value.add(new Entry<>("3", "abe"));
+        value.add(new Entry<>("4", "abf"));
+        value.add(new Entry<>("5", "abg"));
         cacheService.cacheList(1, 101, value);
 
         return message;
@@ -64,7 +66,8 @@ public class TestCacheController {
     public ResMessage testReadListFromCache(){
         ResMessage message = ResMessage.creator();
 
-        cacheService.readCacheValue(0, 100);
+        List<Entry> entries = cacheService.readCacheValue(1, 101, 0, 2);
+        message.put("entries", entries);
 
         return message;
     }

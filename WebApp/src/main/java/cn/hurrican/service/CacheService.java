@@ -1,9 +1,6 @@
 package cn.hurrican.service;
 
-import cn.hurrican.annotation.CacheValue;
-import cn.hurrican.annotation.KeyParam;
-import cn.hurrican.annotation.ReadCache;
-import cn.hurrican.annotation.WriteCache;
+import cn.hurrican.annotation.*;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
 import cn.hurrican.model.Entry;
@@ -40,7 +37,10 @@ public class CacheService {
 
 
     @ReadCache(type = KeyType.LIST, prefixKey = "type:list:", postfixKey = "aid:platformId", valueClazz = Entry.class)
-    public List<Entry> readCacheValue(@KeyParam("platformId")Integer platformId,@KeyParam("aid") Integer aid){
+    public List<Entry> readCacheValue(@KeyParam("platformId") Integer platformId,
+                                      @KeyParam("aid") Integer aid,
+                                      @ListIndex Integer lindex,
+                                      @ListIndex(indexType = CacheConstant.RIGHT_INDEX) Integer rindex) {
 
         return null;
     }

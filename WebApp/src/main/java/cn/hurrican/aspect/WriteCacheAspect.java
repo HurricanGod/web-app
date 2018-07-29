@@ -1,15 +1,13 @@
 package cn.hurrican.aspect;
 
-import cn.hurrican.annotation.CacheValue;
-import cn.hurrican.annotation.HashField;
-import cn.hurrican.annotation.KeyParam;
-import cn.hurrican.annotation.WriteCache;
+import cn.hurrican.annotation.*;
 import cn.hurrican.config.AbstractHostingCacheHandler;
 import cn.hurrican.config.CacheBean;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
 import cn.hurrican.exception.RedisKeyMismatchRuntimeException;
 import cn.hurrican.redis.RedisExecutor;
+import cn.hurrican.utils.ClassUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -78,9 +76,10 @@ public class WriteCacheAspect {
                     } else if (annotation.annotationType().equals(CacheValue.class)) {
                         cacheBean.setValue(params[i]);
                         cacheBean.setType(((CacheValue)annotation).type());
-
                     } else if (annotation.annotationType().equals(HashField.class)) {
-                        cacheBean.setField(params[i].toString());
+                        cacheBean.setField(new String[]{params[i].toString()});
+                    } else if (annotation.annotationType().equals(ZSetScore.class)) {
+
                     }
                 }
             }
@@ -98,6 +97,9 @@ public class WriteCacheAspect {
                         break;
                     case KeyType.LIST:
                         cacheObjectToList(args, key, cacheBean);
+                        break;
+                    case KeyType.SORTED_SET:
+                        cacheObjectToSortedSet(args, key, cacheBean);
                         break;
                     default:
                         break;
@@ -205,22 +207,44 @@ public class WriteCacheAspect {
     private void cacheObjectToHash(WriteCache args, String key, CacheBean cacheBean) {
         executor.doInRedis(instance -> {
             Boolean existHashKey = instance.exists(key);
-            if(isMapType(cacheBean.getType())){
+            if (ClassUtil.superTypeIsMap(cacheBean.getType())) {
                 instance.hmset(key, convertToMap(cacheBean));
             }else{
-                if (cacheBean.getField() != null && cacheBean.getValue() != null) {
+                String[] fieldArray = cacheBean.getField();
+                if (fieldArray != null && fieldArray.length > 0 && cacheBean.getValue() != null) {
                     if (isJavaBasicType(cacheBean.getValue())) {
-                        instance.hset(key, cacheBean.getField(), cacheBean.getValue().toString());
+                        instance.hset(key, fieldArray[0], cacheBean.getValue().toString());
                     } else {
                         ObjectMapper mapper = new ObjectMapper();
                         String valueString = mapper.writeValueAsString(cacheBean.getValue());
-                        instance.hset(key, cacheBean.getField(), valueString);
+                        instance.hset(key, fieldArray[0], valueString);
                     }
                 }else{
                     throw new RedisKeyMismatchRuntimeException("往 hash 存储结构里缓存1个字段时，field 和 value都不允许为 null");
                 }
             }
             if (!existHashKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
+                instance.expire(key, args.expire());
+            }
+        });
+    }
+
+
+    private void cacheObjectToSortedSet(WriteCache args, String key, CacheBean cacheBean) {
+        executor.doInRedis(instance -> {
+            Boolean existSortedSetKey = instance.exists(key);
+            if (ClassUtil.superTypeIsMap(cacheBean.getType())) {
+                instance.zadd(key, (Map<String, Double>) cacheBean.getValue());
+            } else {
+                if (cacheBean.getScores() == null || cacheBean.getValue() == null) {
+                    throw new RedisKeyMismatchRuntimeException("store value to sorted set expect score and value must not null,but there has one more values are null!");
+                } else {
+                    ObjectMapper mapper = new ObjectMapper();
+                    instance.zadd(key, cacheBean.getScores(), mapper.writeValueAsString(cacheBean.getValue()));
+                }
+            }
+
+            if (!existSortedSetKey && args.expire() != CacheConstant.NEVER_EXPIRE) {
                 instance.expire(key, args.expire());
             }
         });

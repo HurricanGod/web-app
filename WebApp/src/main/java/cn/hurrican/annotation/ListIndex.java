@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 public @interface ListIndex {
 
     /**  **/
-    int lindexType() default CacheConstant.LEFT_INDEX;
+    int indexType() default CacheConstant.LEFT_INDEX;
 
 
 }

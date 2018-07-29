@@ -8,6 +8,7 @@ import cn.hurrican.config.CacheBean;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
 import cn.hurrican.redis.RedisExecutor;
+import cn.hurrican.utils.ClassUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,11 +22,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -69,29 +66,51 @@ public class ReadCacheAspect {
                     if (annotation.annotationType().equals(KeyParam.class)) {
                         key = key.replace(((KeyParam) annotation).value(), params[i].toString());
                     } else if (annotation.annotationType().equals(ListIndex.class)) {
-                        int indexType = ((ListIndex) annotation).lindexType();
+                        int indexType = ((ListIndex) annotation).indexType();
                         if(indexType == CacheConstant.LEFT_INDEX){
                             cacheBean.setLindex((Integer) params[i]);
                         }else{
                             cacheBean.setRindex((Integer) params[i]);
                         }
                     } else if (annotation.annotationType().equals(HashField.class)) {
-                        cacheBean.setField(params[i].toString());
+                        if (ClassUtil.superTypeIsMap(((HashField) annotation).clazz())) {
+                            cacheBean.setField(new String[]{params[i].toString()});
+                        } else {
+                            cacheBean.setField((String[]) params[i]);
+                        }
                     }
                 }
             }
 
-            if (isCollectionType(returnType)) {
+            if (isCollectionType(returnType) || ClassUtil.superTypeIsMap(returnType)) {
                 switch (args.type()) {
                     case KeyType.LIST:
                         execResult = readListFromCache(cacheBean, key);
+                        break;
+                    case KeyType.HASH:
+                        execResult = readMapFromCache(cacheBean, key, false);
+                        break;
+                    case KeyType.SET:
+                        execResult = readSetFromCache(cacheBean, key);
                         break;
                     default:
                         break;
                 }
             } else {
-
+                switch (args.type()) {
+                    case KeyType.LIST:
+                        execResult = readOneOfListByIndexFromCache(cacheBean, key);
+                        break;
+                    case KeyType.HASH:
+                        execResult = readMapFromCache(cacheBean, key, true);
+                        break;
+                    default:
+                        break;
+                }
             }
+        }
+        if (execResult != null) {
+            return execResult;
         }
 
         try {
@@ -102,6 +121,18 @@ public class ReadCacheAspect {
 
         return execResult;
 
+    }
+
+    private Object readOneOfListByIndexFromCache(CacheBean cacheBean, String key) {
+        return executor.doInRedis(instance -> {
+            Integer index = Optional.ofNullable(cacheBean.getLindex()).orElse(cacheBean.getRindex());
+            if (index == null) {
+                throw new RuntimeException("查询list存储结构必须指定索引号！");
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            String json = instance.lindex(key, index);
+            return mapper.readValue(json, cacheBean.getType());
+        });
     }
 
     private Object readListFromCache(CacheBean cacheBean, String key) {
@@ -125,9 +156,34 @@ public class ReadCacheAspect {
                     throw new RuntimeException("查询list存储结构必须指定索引号！");
                 }
                 String json = instance.lindex(key, index);
-                objects.add(mapper.readValue(json, cacheBean.getType()));
+                Object value = mapper.readValue(json, cacheBean.getType());
+
+                objects.add(value);
             }
             return objects;
+        });
+    }
+
+    private Object readMapFromCache(CacheBean cacheBean, String key, boolean isOnlyField) {
+        return executor.doInRedis(instance -> {
+            HashMap<String, String> resultMap = new HashMap<>(8);
+            List<String> resultList = instance.hmget(key, cacheBean.getField());
+            if (resultList != null && resultList.size() > 0) {
+                for (int i = 0; i < cacheBean.getField().length; i++) {
+                    resultMap.put(cacheBean.getField()[i], resultList.get(i));
+                }
+            }
+            if (isOnlyField && cacheBean.getField() != null && cacheBean.getField().length == 1) {
+                return resultMap.get(cacheBean.getField()[0]);
+            }
+            return resultMap;
+        });
+    }
+
+
+    private Object readSetFromCache(CacheBean cacheBean, String key) {
+        return executor.doInRedis(instance -> {
+            return instance.smembers(key);
         });
     }
 

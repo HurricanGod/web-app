@@ -32,4 +32,18 @@ public interface CacheConstant {
 
     int RIGHT_INDEX = -1;
 
+    /**
+     * sorted set 查找时指定结果集为顺序
+     */
+    int ASC = 0;
+
+    /**
+     * sorted set 查找时指定结果集为逆序
+     */
+    int DESC = 1;
+
+    int MIN_SCORE = 0;
+
+    int MAX_SCORE = -1;
+
 }

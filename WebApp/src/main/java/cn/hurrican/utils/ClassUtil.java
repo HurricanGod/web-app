@@ -6,9 +6,12 @@ package cn.hurrican.utils;
 import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -62,5 +65,22 @@ public class ClassUtil {
             methodSigMap.put(m, sig);
             return sig;
         }
+    }
+
+
+    /**
+     * 判断一个类是否实现了 Map 接口
+     *
+     * @param clazz 类
+     * @return
+     */
+    public static boolean superTypeIsMap(Class clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        if (clazz.equals(Map.class)) {
+            return true;
+        }
+        return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toSet()).contains(Map.class);
     }
 }

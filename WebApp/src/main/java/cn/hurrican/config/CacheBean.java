@@ -16,14 +16,31 @@ import lombok.experimental.Accessors;
 public class CacheBean {
 
 
-    /** 缓存对象类型 **/
+    /**
+     * 缓存Java实例的类型
+     **/
     private Class type;
+
+    /** 要放入缓存的Java实例 **/
     private Object value;
-    private String field;
-    private Double scores;
+
+    /**
+     * 指定要存取 Redis hash 存储结构的字段
+     **/
+    private String[] field;
 
     private Integer lindex;
+
     private Integer rindex;
+
+    /**
+     * 对 Redis 中的 sorted set 进行存取时指定的 score
+     **/
+    private Double scores;
+
+    private Double minScore;
+
+    private Double maxScore;
 
     public static CacheBean build(){
         return new CacheBean();
