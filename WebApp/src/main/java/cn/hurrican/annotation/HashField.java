@@ -16,5 +16,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Documented
 public @interface HashField {
+
+    /**
+     * clazz 为 List.class 表示读缓存时指定的多个 field <br/>
+     * clazz 为 String.class 表示读或写缓存时指定的field <br/>
+     * @return
+     */
     Class clazz() default String.class;
 }

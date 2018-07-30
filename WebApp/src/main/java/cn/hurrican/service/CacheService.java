@@ -7,6 +7,7 @@ import cn.hurrican.model.Entry;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Hurrican
@@ -43,5 +44,28 @@ public class CacheService {
                                       @ListIndex(indexType = CacheConstant.RIGHT_INDEX) Integer rindex) {
 
         return null;
+    }
+
+
+    @WriteCache(type = KeyType.HASH, prefixKey = "type:hash:", postfixKey = "aid:platformId")
+    public void cacheMap(@KeyParam("platformId") Integer platformId,
+                         @KeyParam("aid") Integer aid,
+                         @CacheValue(type = Map.class) Map<String,Integer> map){
+
+    }
+
+    @ReadCache(type = KeyType.HASH, prefixKey = "type:hash:", postfixKey = "aid:platformId", valueClazz = Integer.class)
+    public Map<String, Integer> readMapFromCache(@KeyParam("platformId") Integer platformId,
+                                                 @KeyParam("aid") Integer aid,
+                                                 @HashField(clazz = List.class) List<String> fieldList){
+        return null;
+    }
+
+    @WriteCache(type = KeyType.HASH, prefixKey = "type:hash:", postfixKey = "aid:platformId")
+    public void addOneFieldToMap(@KeyParam("platformId") Integer platformId,
+                                 @KeyParam("aid") Integer aid,
+                                 @HashField String field,
+                                 @CacheValue Object value){
+
     }
 }

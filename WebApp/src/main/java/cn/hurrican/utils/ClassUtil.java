@@ -7,6 +7,7 @@ import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -82,5 +83,20 @@ public class ClassUtil {
             return true;
         }
         return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toSet()).contains(Map.class);
+    }
+
+    /**
+     * 判断一个类是否实现了 Collection 接口
+     * @param clazz
+     * @return
+     */
+    public static boolean superTypeIsCollection(Class clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        if (clazz.equals(Collection.class)) {
+            return true;
+        }
+        return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toSet()).contains(Collection.class);
     }
 }

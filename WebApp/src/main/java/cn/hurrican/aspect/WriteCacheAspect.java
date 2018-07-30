@@ -70,13 +70,13 @@ public class WriteCacheAspect {
             for (int i = 0; i < methodParameterAnnotations.length; i++) {
                 for (int j = 0; j < methodParameterAnnotations[i].length; j++) {
                     Annotation annotation = methodParameterAnnotations[i][j];
-                    System.out.println(annotation.annotationType().equals(KeyParam.class));
                     if (annotation.annotationType().equals(KeyParam.class)) {
                         key = key.replace(((KeyParam) annotation).value(), params[i].toString());
                     } else if (annotation.annotationType().equals(CacheValue.class)) {
                         cacheBean.setValue(params[i]);
                         cacheBean.setType(((CacheValue)annotation).type());
                     } else if (annotation.annotationType().equals(HashField.class)) {
+
                         cacheBean.setField(new String[]{params[i].toString()});
                     } else if (annotation.annotationType().equals(ZSetScore.class)) {
 
@@ -257,7 +257,7 @@ public class WriteCacheAspect {
         if(value instanceof Map){
             ((Map) value).forEach((k,v) ->{
                 try {
-                    map.put(mapper.writeValueAsString(k), mapper.writeValueAsString(v));
+                    map.put(k.toString(), mapper.writeValueAsString(v));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                     logger.error("convertToMap()方法发生异常：" + e);
@@ -293,13 +293,4 @@ public class WriteCacheAspect {
         return false;
     }
 
-    private boolean isMapType(Class clazz){
-        if(clazz == null){
-            return false;
-        }
-        if(clazz.equals(Map.class)){
-            return true;
-        }
-        return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toSet()).contains(Map.class);
-    }
 }

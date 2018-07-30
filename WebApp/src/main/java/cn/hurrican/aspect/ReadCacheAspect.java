@@ -4,10 +4,12 @@ import cn.hurrican.annotation.HashField;
 import cn.hurrican.annotation.KeyParam;
 import cn.hurrican.annotation.ListIndex;
 import cn.hurrican.annotation.ReadCache;
+import cn.hurrican.annotation.ZSetScore;
 import cn.hurrican.config.CacheBean;
 import cn.hurrican.config.CacheConstant;
 import cn.hurrican.config.KeyType;
 import cn.hurrican.redis.RedisExecutor;
+import cn.hurrican.service.Try;
 import cn.hurrican.utils.ClassUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -73,10 +75,17 @@ public class ReadCacheAspect {
                             cacheBean.setRindex((Integer) params[i]);
                         }
                     } else if (annotation.annotationType().equals(HashField.class)) {
-                        if (ClassUtil.superTypeIsMap(((HashField) annotation).clazz())) {
-                            cacheBean.setField(new String[]{params[i].toString()});
+                        if (ClassUtil.superTypeIsCollection(((HashField) annotation).clazz())) {
+                            String[] fieldArray = new String[((Collection<String>) params[i]).size()];
+                            cacheBean.setField(((Collection<String>) params[i]).toArray(fieldArray));
                         } else {
-                            cacheBean.setField((String[]) params[i]);
+                            cacheBean.setField(new String[]{params[i].toString()});
+                        }
+                    } else if( annotation.annotationType().equals(ZSetScore.class) ){
+                        if(((ZSetScore)annotation).scoreRange() == CacheConstant.MIN_SCORE){
+                            cacheBean.setMinScore((Double) params[i]);
+                        }else{
+                            cacheBean.setMaxScore((Double) params[i]);
                         }
                     }
                 }
@@ -118,9 +127,7 @@ public class ReadCacheAspect {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-
         return execResult;
-
     }
 
     private Object readOneOfListByIndexFromCache(CacheBean cacheBean, String key) {
@@ -166,11 +173,17 @@ public class ReadCacheAspect {
 
     private Object readMapFromCache(CacheBean cacheBean, String key, boolean isOnlyField) {
         return executor.doInRedis(instance -> {
-            HashMap<String, String> resultMap = new HashMap<>(8);
+            HashMap<String, Object> resultMap = new HashMap<>(8);
+            ObjectMapper mapper = new ObjectMapper();
             List<String> resultList = instance.hmget(key, cacheBean.getField());
             if (resultList != null && resultList.size() > 0) {
                 for (int i = 0; i < cacheBean.getField().length; i++) {
-                    resultMap.put(cacheBean.getField()[i], resultList.get(i));
+                    try{
+                        resultMap.put(cacheBean.getField()[i], mapper.readValue(resultList.get(i), cacheBean.getType()));
+                    }catch( Exception e){
+                        logger.error(e);
+                        e.printStackTrace();
+                    }
                 }
             }
             if (isOnlyField && cacheBean.getField() != null && cacheBean.getField().length == 1) {
@@ -183,7 +196,13 @@ public class ReadCacheAspect {
 
     private Object readSetFromCache(CacheBean cacheBean, String key) {
         return executor.doInRedis(instance -> {
-            return instance.smembers(key);
+            Set<String> smembers = instance.smembers(key);
+            if(smembers != null && smembers.size() > 0){
+                ObjectMapper mapper = new ObjectMapper();
+                return smembers.stream().map(Try.of(m -> mapper.readValue(m, cacheBean.getType()), null))
+                        .collect(Collectors.toSet());
+            }
+            return null;
         });
     }
 

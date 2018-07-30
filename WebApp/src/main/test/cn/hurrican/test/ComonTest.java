@@ -154,8 +154,19 @@ public class ComonTest {
 
     @Test
     public void testMethod6() throws IOException {
+        List<String> list = new ArrayList<>(10);
+        list.add("aaa");
+        list.add("abb");
+        list.add("abc");
+
+        Object obj = list;
+        Collection<String> collection = (Collection<String>) obj;
+        collection.forEach(System.out::println);
+        System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
+
+
         ObjectMapper mapper = new ObjectMapper();
-        String key = "abc";
+        String key = "1.2";
         String s = mapper.writeValueAsString(key);
         System.out.println("s = " + s);
         String value = mapper.readValue(s, String.class);

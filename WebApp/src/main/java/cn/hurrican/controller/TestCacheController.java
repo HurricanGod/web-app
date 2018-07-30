@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Hurrican
@@ -69,6 +71,46 @@ public class TestCacheController {
         List<Entry> entries = cacheService.readCacheValue(1, 101, 0, 2);
         message.put("entries", entries);
 
+        return message;
+    }
+
+
+    @RequestMapping(value = "/cacheMultiField.do", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public ResMessage testCacheMapForManyField(){
+        ResMessage message = ResMessage.creator();
+
+        HashMap<String, Integer> map = new HashMap<>(8);
+        map.put("age", 20);
+        map.put("height", 180);
+        map.put("width", 0);
+       cacheService.cacheMap(0, 10086, map);
+
+        return message;
+    }
+
+    @RequestMapping(value = "/cacheOneField.do", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public ResMessage testOneFieldToMap(String field, String value){
+        ResMessage message = ResMessage.creator();
+        cacheService.addOneFieldToMap(0, 10086, field, value);
+        return message.msg("ok");
+    }
+
+    @RequestMapping(value = "/readMultiField.do", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public ResMessage testReadMultiFieldFromCache(String field){
+        ResMessage message = ResMessage.creator();
+        ArrayList<String> list = new ArrayList<>();
+        list.add("age");
+        list.add("height");
+        list.add("width");
+        if(field != null){
+            list.add(field);
+        }
+
+        Map<String, Integer> map = cacheService.readMapFromCache(0, 10086, list);
+        message.put("map", map);
         return message;
     }
 }
