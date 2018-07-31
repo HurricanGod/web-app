@@ -31,6 +31,8 @@ public class UniqueKeyElement {
 
     private String other;
 
+    private Date now = new Date();
+
     public static UniqueKeyElement build(){
         return new UniqueKeyElement();
     }

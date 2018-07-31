@@ -79,10 +79,27 @@
         <zkclient.version>0.1</zkclient.version>
         <rocketmq.client.version>4.2.0</rocketmq.client.version>
         <fileupload.version>1.2.2</fileupload.version>
+        <ognl.version>3.0.1</ognl.version>
+        <javassist.version>3.14.0-GA</javassist.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>ognl</groupId>
+                <artifactId>ognl</artifactId>
+                <version>${ognl.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+
+
             <!-- 校验 -->
             <dependency>
                 <groupId>org.hibernate</groupId>

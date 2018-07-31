@@ -3,19 +3,26 @@ package cn.hurrican.test;
 import cn.hurrican.config.CacheBean;
 import cn.hurrican.model.ColorfulQuestion;
 import cn.hurrican.model.Entry;
+import cn.hurrican.model.UniqueKeyElement;
+import cn.hurrican.utils.DateTimeUtils;
 import cn.hurrican.utils.JSONUtils;
 import cn.hurrican.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ognl.Ognl;
+import ognl.OgnlContext;
+import ognl.OgnlException;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -171,5 +178,31 @@ public class ComonTest {
         System.out.println("s = " + s);
         String value = mapper.readValue(s, String.class);
         System.out.println("value = " + value);
+    }
+
+    @Test
+    public void testMethod7(){
+        String format = String.format("%s:%s:%s", 100, 10, "Hello");
+        System.out.println("format = " + format);
+        boolean equals = Objects.equals(format, "100:10:Hello");
+        System.out.println("equals = " + equals);
+    }
+
+    @Test
+    public void testMethod8() throws OgnlException {
+        OgnlContext context = new OgnlContext();
+        // 将员工设置为根对象
+        UniqueKeyElement element = new UniqueKeyElement();
+        element.setNow(DateTimeUtils.addSpecifiedSecondToDate(new Date(), 3600));
+        context.put("root", element);
+        context.setRoot(element);
+
+
+        // 构建Ognl表达式的树状表示,用来获取  new java.lang.Date().after(#dept.now)
+        Object expression = Ognl.parseExpression("");
+
+        // 解析树状表达式，返回结果
+        Object result = Ognl.getValue(expression, context, context.getRoot());
+        System.out.println("result = " + result);
     }
 }
