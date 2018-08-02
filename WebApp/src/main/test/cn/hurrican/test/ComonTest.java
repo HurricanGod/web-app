@@ -18,16 +18,8 @@ import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -197,10 +189,27 @@ public class ComonTest {
         // 将员工设置为根对象
         UniqueKeyElement element = new UniqueKeyElement();
         element.setNow(DateTimeUtils.addSpecifiedSecondToDate(new Date(), 3600));
-        context.put("root", element);
-        context.setRoot(element);
+        HashMap<String, Map<String, Map<String, Object>>> rootMap = new HashMap<>(16);
+        HashMap<String, Map<String, Object>> son1 = new HashMap<>(16);
+        HashMap<String, Map<String, Object>> son2 = new HashMap<>(16);
+
+        Map<String, Object> grandson1 = new HashMap<>(16);
+        grandson1.put("element", element);
+        grandson1.put("key", 1000);
+
+        Map<String, Object> grandson2 = new HashMap<>(16);
+        grandson2.put("ele", element);
+        grandson2.put("value", 1000);
+
+        son1.put("grandson1", grandson1);
+        son2.put("grandson1", grandson1);
+        son2.put("grandson2", grandson2);
+        rootMap.put("son1", son1);
+        rootMap.put("son2", son2);
+        context.put("root", rootMap);
+        context.setRoot(rootMap);
         // 构建Ognl表达式的树状表示,用来获取  new java.lang.Date().after(#dept.now)
-        Object expression = Ognl.parseExpression("");
+        Object expression = Ognl.parseExpression("#root.son1.grandson1.key");
 
         // 解析树状表达式，返回结果
         Object result = Ognl.getValue(expression, context, context.getRoot());
@@ -226,5 +235,13 @@ public class ComonTest {
                Arrays.stream(m.getParameters()).forEach(System.out::println);
             }
         });
+    }
+
+    @Test
+    public void testMethod11() {
+        Function<String, Integer> function = Integer::valueOf;
+        Integer apply = function.compose((Function<String, String>) s -> s + "" + s).apply("10");
+
+        System.out.println("apply = " + apply);
     }
 }
