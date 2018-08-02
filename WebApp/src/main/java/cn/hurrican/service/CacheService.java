@@ -37,7 +37,7 @@ public class CacheService {
     }
 
 
-    @ReadCache(type = KeyType.LIST, prefixKey = "type:list:", postfixKey = "aid:platformId", valueClazz = Entry.class)
+    @ReadCache(type = KeyType.LIST, prefixKey = "type:list:", postfixKey = "aid:platformId", clazz = Entry.class)
     public List<Entry> readCacheValue(@KeyParam("platformId") Integer platformId,
                                       @KeyParam("aid") Integer aid,
                                       @ListIndex Integer lindex,
@@ -54,7 +54,7 @@ public class CacheService {
 
     }
 
-    @ReadCache(type = KeyType.HASH, prefixKey = "type:hash:", postfixKey = "aid:platformId", valueClazz = Integer.class)
+    @ReadCache(type = KeyType.HASH, prefixKey = "type:hash:", postfixKey = "aid:platformId", clazz = Integer.class)
     public Map<String, Integer> readMapFromCache(@KeyParam("platformId") Integer platformId,
                                                  @KeyParam("aid") Integer aid,
                                                  @HashField(clazz = List.class) List<String> fieldList){

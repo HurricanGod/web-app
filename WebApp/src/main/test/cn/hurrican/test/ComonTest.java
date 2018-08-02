@@ -222,7 +222,9 @@ public class ComonTest {
     public void testMethod10(){
         Class<Jedis> jedisClass = Jedis.class;
         Arrays.stream(jedisClass.getDeclaredMethods()).forEach(m -> {
-            System.out.println(m.toString());
+            if(m.getParameterCount() > 1){
+               Arrays.stream(m.getParameters()).forEach(System.out::println);
+            }
         });
     }
 }
