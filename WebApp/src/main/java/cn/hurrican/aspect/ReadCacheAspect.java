@@ -4,6 +4,7 @@ import cn.hurrican.annotation.HashField;
 import cn.hurrican.annotation.KeyParam;
 import cn.hurrican.annotation.ListIndex;
 import cn.hurrican.annotation.ReadCache;
+import cn.hurrican.annotation.SortedSetInstruct;
 import cn.hurrican.annotation.ZSetScore;
 import cn.hurrican.config.CacheBean;
 import cn.hurrican.config.CacheConstant;
@@ -11,6 +12,7 @@ import cn.hurrican.config.KeyType;
 import cn.hurrican.redis.RedisExecutor;
 import cn.hurrican.service.Try;
 import cn.hurrican.utils.ClassUtil;
+import cn.hurrican.utils.RedisInstruct;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +26,13 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,58 +57,31 @@ public class ReadCacheAspect {
 
     @Around(value = "readValueFromCache() && @annotation(args)")
     public Object readCache(ProceedingJoinPoint joinPoint, ReadCache args) {
-        String methodInvokeName = joinPoint.getSignature().toLongString();
         Object execResult = null;
+        String methodInvokeName = joinPoint.getSignature().toLongString();
         List<Method> itemMethod = Arrays.stream(joinPoint.getTarget().getClass().getDeclaredMethods())
-                .filter(e -> e.toString().equals(methodInvokeName))
-                .collect(Collectors.toList());
+                .filter(e -> e.toString().equals(methodInvokeName)).collect(Collectors.toList());
         if (itemMethod.size() > 0) {
             Method method = itemMethod.get(0);
-            CacheBean cacheBean = CacheBean.build();
-            cacheBean.setType(args.valueClazz());
-            String key = args.prefixKey() + args.postfixKey();
             Class<?> returnType = method.getReturnType();
-            Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-            Object[] params = joinPoint.getArgs();
-            for (int i = 0; i < parameterAnnotations.length; i++) {
-                for (int j = 0; j < parameterAnnotations[i].length; j++) {
-                    Annotation annotation = parameterAnnotations[i][j];
-                    if (annotation.annotationType().equals(KeyParam.class)) {
-                        key = key.replace(((KeyParam) annotation).value(), params[i].toString());
-                    } else if (annotation.annotationType().equals(ListIndex.class)) {
-                        int indexType = ((ListIndex) annotation).indexType();
-                        if(indexType == CacheConstant.LEFT_INDEX){
-                            cacheBean.setLindex((Integer) params[i]);
-                        }else{
-                            cacheBean.setRindex((Integer) params[i]);
-                        }
-                    } else if (annotation.annotationType().equals(HashField.class)) {
-                        if (ClassUtil.superTypeIsCollection(((HashField) annotation).clazz())) {
-                            String[] fieldArray = new String[((Collection<String>) params[i]).size()];
-                            cacheBean.setField(((Collection<String>) params[i]).toArray(fieldArray));
-                        } else {
-                            cacheBean.setField(new String[]{params[i].toString()});
-                        }
-                    } else if( annotation.annotationType().equals(ZSetScore.class) ){
-                        if(((ZSetScore)annotation).scoreRange() == CacheConstant.MIN_SCORE){
-                            cacheBean.setMinScore((Double) params[i]);
-                        }else{
-                            cacheBean.setMaxScore((Double) params[i]);
-                        }
-                    }
-                }
-            }
+            CacheBean cacheBean = prepareReadCache(joinPoint, args, method);
 
-            if (isCollectionType(returnType) || ClassUtil.superTypeIsMap(returnType)) {
+            if (ClassUtil.superTypeIsCollection(returnType) || ClassUtil.superTypeIsMap(returnType)) {
                 switch (args.type()) {
                     case KeyType.LIST:
-                        execResult = readListFromCache(cacheBean, key);
+                        execResult = readListFromCache(cacheBean);
                         break;
                     case KeyType.HASH:
-                        execResult = readMapFromCache(cacheBean, key, false);
+                        execResult = readMapFromCache(cacheBean, false);
                         break;
                     case KeyType.SET:
-                        execResult = readSetFromCache(cacheBean, key);
+                        execResult = readSetFromCache(cacheBean);
+                        break;
+                    case KeyType.SORTED_SET:
+                        if (!SortedSetInstruct.LEGAL_SET.contains(args.instruct())) {
+                            throw new RuntimeException(String.format("注解 @ReadCache 中当 type = KeyType.SORTED_SET 时 instruct = %s 非法", args.instruct()));
+                        }
+
                         break;
                     default:
                         break;
@@ -108,12 +89,13 @@ public class ReadCacheAspect {
             } else {
                 switch (args.type()) {
                     case KeyType.LIST:
-                        execResult = readOneOfListByIndexFromCache(cacheBean, key);
+                        execResult = readOneOfListByIndexFromCache(cacheBean);
                         break;
                     case KeyType.HASH:
-                        execResult = readMapFromCache(cacheBean, key, true);
+                        execResult = readMapFromCache(cacheBean, true);
                         break;
                     default:
+                        execResult = readGeneralStringValueFromCache(cacheBean, args);
                         break;
                 }
             }
@@ -121,7 +103,6 @@ public class ReadCacheAspect {
         if (execResult != null) {
             return execResult;
         }
-
         try {
             execResult = joinPoint.proceed();
         } catch (Throwable throwable) {
@@ -130,24 +111,111 @@ public class ReadCacheAspect {
         return execResult;
     }
 
-    private Object readOneOfListByIndexFromCache(CacheBean cacheBean, String key) {
+    private CacheBean prepareReadCache(ProceedingJoinPoint joinPoint, ReadCache args, Method method) {
+        CacheBean cacheBean = CacheBean.build();
+        cacheBean.setType(args.clazz());
+        String key = args.prefixKey() + args.postfixKey();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        Object[] params = joinPoint.getArgs();
+        for (int i = 0; i < parameterAnnotations.length; i++) {
+            for (int j = 0; j < parameterAnnotations[i].length; j++) {
+                Annotation annotation = parameterAnnotations[i][j];
+                if (annotation.annotationType().equals(KeyParam.class)) {
+                    key = key.replace(((KeyParam) annotation).value(), params[i].toString());
+                } else if (annotation.annotationType().equals(ListIndex.class)) {
+                    int indexType = ((ListIndex) annotation).indexType();
+                    if (indexType == CacheConstant.LEFT_INDEX) {
+                        cacheBean.setLindex((Integer) params[i]);
+                    } else {
+                        cacheBean.setRindex((Integer) params[i]);
+                    }
+                } else if (annotation.annotationType().equals(HashField.class)) {
+                    if (ClassUtil.superTypeIsCollection(((HashField) annotation).clazz())) {
+                        String[] fieldArray = new String[((Collection<String>) params[i]).size()];
+                        cacheBean.setField(((Collection<String>) params[i]).toArray(fieldArray));
+                    } else {
+                        cacheBean.setField(new String[]{params[i].toString()});
+                    }
+                } else if (annotation.annotationType().equals(ZSetScore.class)) {
+                    if (((ZSetScore) annotation).param() == CacheConstant.LEFT_INDEX) {
+                        cacheBean.setLindex((Integer) params[i]);
+                    } else if (((ZSetScore) annotation).param() == CacheConstant.RIGHT_INDEX) {
+                        cacheBean.setRindex((Integer) params[i]);
+                    } else if (((ZSetScore) annotation).param() == CacheConstant.MIN_SCORE) {
+                        cacheBean.setMinScore((Double) params[i]);
+                    } else if (((ZSetScore) annotation).param() == CacheConstant.MAX_SCORE) {
+                        cacheBean.setMaxScore((Double) params[i]);
+                    }
+                }
+            }
+        }
+        cacheBean.setKey(key);
+        return cacheBean;
+    }
+
+    private Object readSortedSetValueFromCache(CacheBean cacheBean, ReadCache args) {
         return executor.doInRedis(instance -> {
+            if (args.order() == CacheConstant.ASC) {
+                Method method = RedisInstruct.INSTRUCT_SET.get(KeyType.SORTED_SET).get(args.instruct());
+
+                Object[] twoParams = new Object[]{cacheBean.getKey(), cacheBean.getLindex(),};
+            } else {
+                throw new RuntimeException("注解 @ReadCache 暂不支持 order = CacheConstant.DESC");
+            }
+            return null;
+        });
+    }
+
+
+    private Object readGeneralStringValueFromCache(CacheBean cacheBean, ReadCache args) {
+        return executor.doInRedis(instance -> {
+            String key = cacheBean.getKey();
+            if (!instance.exists(key)) {
+                return null;
+            }
+            String cacheString = instance.get(cacheBean.getKey());
+            Object returnValue;
+            switch (args.type()) {
+                case KeyType.INT_STRING:
+                    returnValue = Integer.valueOf(cacheString);
+                    break;
+                case KeyType.DOUBLE_STRING:
+                    returnValue = Double.valueOf(cacheString);
+                    break;
+                default:
+                    returnValue = cacheString;
+                    break;
+            }
+            return returnValue;
+        });
+    }
+
+    private Object readOneOfListByIndexFromCache(CacheBean cacheBean) {
+        return executor.doInRedis(instance -> {
+            String key = cacheBean.getKey();
+            if (!instance.exists(key)) {
+                return null;
+            }
             Integer index = Optional.ofNullable(cacheBean.getLindex()).orElse(cacheBean.getRindex());
             if (index == null) {
                 throw new RuntimeException("查询list存储结构必须指定索引号！");
             }
             ObjectMapper mapper = new ObjectMapper();
             String json = instance.lindex(key, index);
-            return mapper.readValue(json, cacheBean.getType());
+            return Optional.ofNullable(json).map(Try.of((ele -> mapper.readValue(ele, cacheBean.getType())), null)).orElse(null);
         });
     }
 
-    private Object readListFromCache(CacheBean cacheBean, String key) {
+    private Object readListFromCache(CacheBean cacheBean) {
         return executor.doInRedis(instance -> {
+            String key = cacheBean.getKey();
+            if (!instance.exists(key)) {
+                return null;
+            }
             ArrayList<Object> objects = new ArrayList<>();
             ObjectMapper mapper = new ObjectMapper();
 
-            if(cacheBean.getLindex() != null && cacheBean.getRindex() != null){
+            if (cacheBean.getLindex() != null && cacheBean.getRindex() != null) {
                 List<String> jsonList = instance.lrange(key, cacheBean.getLindex(), cacheBean.getRindex());
                 jsonList.forEach(ele -> {
                     try {
@@ -157,9 +225,9 @@ public class ReadCacheAspect {
                         logger.error(e);
                     }
                 });
-            }else{
+            } else {
                 Integer index = Optional.ofNullable(cacheBean.getLindex()).orElse(cacheBean.getRindex());
-                if(index == null){
+                if (index == null) {
                     throw new RuntimeException("查询list存储结构必须指定索引号！");
                 }
                 String json = instance.lindex(key, index);
@@ -171,16 +239,24 @@ public class ReadCacheAspect {
         });
     }
 
-    private Object readMapFromCache(CacheBean cacheBean, String key, boolean isOnlyField) {
+    private Object readMapFromCache(CacheBean cacheBean, boolean isOnlyField) {
         return executor.doInRedis(instance -> {
+            String key = cacheBean.getKey();
+            if (!instance.exists(key)) {
+                return null;
+            }
             HashMap<String, Object> resultMap = new HashMap<>(8);
             ObjectMapper mapper = new ObjectMapper();
             List<String> resultList = instance.hmget(key, cacheBean.getField());
             if (resultList != null && resultList.size() > 0) {
                 for (int i = 0; i < cacheBean.getField().length; i++) {
-                    try{
-                        resultMap.put(cacheBean.getField()[i], mapper.readValue(resultList.get(i), cacheBean.getType()));
-                    }catch( Exception e){
+                    try {
+                        if (resultList.get(i) != null) {
+                            resultMap.put(cacheBean.getField()[i], mapper.readValue(resultList.get(i), cacheBean.getType()));
+                        } else {
+                            resultMap.put(cacheBean.getField()[i], null);
+                        }
+                    } catch (Exception e) {
                         logger.error(e);
                         e.printStackTrace();
                     }
@@ -194,10 +270,14 @@ public class ReadCacheAspect {
     }
 
 
-    private Object readSetFromCache(CacheBean cacheBean, String key) {
+    private Object readSetFromCache(CacheBean cacheBean) {
         return executor.doInRedis(instance -> {
+            String key = cacheBean.getKey();
+            if (!instance.exists(key)) {
+                return null;
+            }
             Set<String> smembers = instance.smembers(key);
-            if(smembers != null && smembers.size() > 0){
+            if (smembers != null && smembers.size() > 0) {
                 ObjectMapper mapper = new ObjectMapper();
                 return smembers.stream().map(Try.of(m -> mapper.readValue(m, cacheBean.getType()), null))
                         .collect(Collectors.toSet());
@@ -206,19 +286,4 @@ public class ReadCacheAspect {
         });
     }
 
-
-    /**
-     * 判断一个类是否实现了 Collection 接口
-     * @param clazz
-     * @return
-     */
-    public boolean isCollectionType(Class clazz) {
-        if (clazz == null) {
-            return false;
-        }
-        if (clazz.equals(Collection.class)) {
-            return true;
-        }
-        return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toSet()).contains(Collection.class);
-    }
 }

@@ -1,7 +1,5 @@
 package cn.hurrican.annotation;
 
-import cn.hurrican.config.CacheConstant;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,25 +27,14 @@ public @interface ZSetScore {
     Class<?> clazz() default Double.class;
 
     /**
-     * 使用 zrange()时用于指定是 start 还是 size
-     *
-     * @return
+     * Redis sorted set 命令需提供的参数 <br/>
+     * <ul>
+     *     <li>CacheConstant.LEFT_INDEX 用于指定 start 参数</li>
+     *     <li>CacheConstant.RIGHT_INDEX 用于指定 end 参数</li>
+     *     <li>CacheConstant.MIN_SCORE 用于指定 min_score 参数</li>
+     *     <li>CacheConstant.MAX_SCORE 用于指定 max_score 参数</li>
+     * </ul>
      */
-    int rangeType() default CacheConstant.LEFT_INDEX;
+    int param();
 
-    /**
-     * 使用 zrangeByScore() 时,用于指定是 min_score 还是 max_score
-     *
-     * @return
-     */
-    int scoreRange() default CacheConstant.MIN_SCORE;
-
-    /**
-     * 对排序集进行查询时指定是顺序还是逆序 <br/>
-     * 若为 CacheConstant.ASC，进行的操作诸如 instance.zrange()  ...<br/>
-     * 若为 CacheConstant.DESC，进行的操作诸如 instance.zrevrange()  ...
-     *
-     * @return
-     */
-    int order() default CacheConstant.ASC;
 }

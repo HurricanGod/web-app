@@ -10,10 +10,12 @@ import cn.hurrican.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.sf.json.JSONArray;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import org.junit.Test;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -196,13 +199,30 @@ public class ComonTest {
         element.setNow(DateTimeUtils.addSpecifiedSecondToDate(new Date(), 3600));
         context.put("root", element);
         context.setRoot(element);
-
-
         // 构建Ognl表达式的树状表示,用来获取  new java.lang.Date().after(#dept.now)
         Object expression = Ognl.parseExpression("");
 
         // 解析树状表达式，返回结果
         Object result = Ognl.getValue(expression, context, context.getRoot());
         System.out.println("result = " + result);
+    }
+
+    @Test
+    public void testMethod9(){
+        List<Integer> list = new ArrayList<>(16);
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            list.add(random.nextInt(3));
+        }
+        String s = JSONArray.fromObject(list).toString();
+        System.out.println("s = " + s);
+    }
+
+    @Test
+    public void testMethod10(){
+        Class<Jedis> jedisClass = Jedis.class;
+        Arrays.stream(jedisClass.getDeclaredMethods()).forEach(m -> {
+            System.out.println(m.toString());
+        });
     }
 }

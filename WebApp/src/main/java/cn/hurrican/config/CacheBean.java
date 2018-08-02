@@ -21,7 +21,14 @@ public class CacheBean {
      **/
     private Class type;
 
-    /** 要放入缓存的Java实例 **/
+    /**
+     * 缓存到 Redis 中的 key
+     */
+    private String key;
+
+    /**
+     * 要放入缓存的Java实例
+     **/
     private Object value;
 
     /**
@@ -42,7 +49,7 @@ public class CacheBean {
 
     private Double maxScore;
 
-    public static CacheBean build(){
+    public static CacheBean build() {
         return new CacheBean();
     }
 }
