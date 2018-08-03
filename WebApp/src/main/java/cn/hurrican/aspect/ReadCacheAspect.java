@@ -155,14 +155,30 @@ public class ReadCacheAspect {
 
     private Object readSortedSetValueFromCache(CacheBean cacheBean, ReadCache args) {
         return executor.doInRedis(instance -> {
-            if (args.order() == CacheConstant.ASC) {
-                Method method = RedisInstruct.INSTRUCT_SET.get(KeyType.SORTED_SET).get(args.instruct());
-
-                Object[] twoParams = new Object[]{cacheBean.getKey(), cacheBean.getLindex(),};
-            } else {
-                throw new RuntimeException("注解 @ReadCache 暂不支持 order = CacheConstant.DESC");
+            Method method = RedisInstruct.INSTRUCT_SET.get(KeyType.SORTED_SET).get(args.instruct());
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            Object[] methodParams = new Object[parameterTypes.length];
+            methodParams[0] = cacheBean.getKey();
+            for (int i = 1; i < parameterTypes.length; i++) {
+                if(i == 1 && parameterTypes[i].equals(double.class)){
+                    methodParams[i] = cacheBean.getMinScore();
+                }else if( i == 1 && parameterTypes[i].equals(long.class) ){
+                    methodParams[i] = cacheBean.getLindex();
+                }else if( i == 1 && parameterTypes[i].equals(String.class) ){
+                    methodParams[i] = cacheBean.getMember();
+                }else if( i == 2 && parameterTypes[i].equals(double.class) ){
+                    methodParams[i] = cacheBean.getMaxScore();
+                }else if( i == 2 && parameterTypes[i].equals(long.class) ){
+                    methodParams[i] = cacheBean.getRindex();
+                }else if( i == 2 && parameterTypes[i].equals(String.class) ){
+                    methodParams[i] = cacheBean.getRmember();
+                }else if( i == 3 && parameterTypes[i].equals(int.class) ){
+                    methodParams[i] = cacheBean.getLindex();
+                }else if( i == 4 && parameterTypes[i].equals(int.class) ){
+                    methodParams[i] = cacheBean.getRindex();
+                }
             }
-            return null;
+            return method.invoke(instance, methodParams);
         });
     }
 

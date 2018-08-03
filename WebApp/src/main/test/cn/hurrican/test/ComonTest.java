@@ -18,7 +18,19 @@ import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -230,11 +242,13 @@ public class ComonTest {
     @Test
     public void testMethod10(){
         Class<Jedis> jedisClass = Jedis.class;
-        Arrays.stream(jedisClass.getDeclaredMethods()).forEach(m -> {
-            if(m.getParameterCount() > 1){
-               Arrays.stream(m.getParameters()).forEach(System.out::println);
-            }
-        });
+        List<Method> list = Arrays.stream(jedisClass.getDeclaredMethods()).filter(m -> m.toString()
+                .equals("public java.util.Set redis.clients.jedis.Jedis.zrange(java.lang.String,long,long)"))
+                .collect(Collectors.toList());
+        if(list.size() > 0){
+            Method method = list.get(0);
+            Arrays.stream(method.getParameterTypes()).forEach(p -> System.out.println(p.equals(long.class)));
+        }
     }
 
     @Test
@@ -243,5 +257,26 @@ public class ComonTest {
         Integer apply = function.compose((Function<String, String>) s -> s + "" + s).apply("10");
 
         System.out.println("apply = " + apply);
+
+        String hello = ((Function<String, String>) s1 -> s1 + s1)
+                .compose((Function<String, String>) str -> str.toUpperCase()).apply("Hello");
+        System.out.println("hello = " + hello);
+
+        String apply1 = ((Function<String, String>) s1 -> s1 + s1).andThen(str -> str + " ;").apply("int a = 10");
+        System.out.println("apply1 = " + apply1);
+    }
+
+    @Test
+    public void testMethod12(){
+        List<Integer> collect = Arrays.asList(Arrays.asList(1, 6, 9), Arrays.asList(1, 2), Arrays.asList(8, 12, 3))
+                .stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+        System.out.println(collect);
+
+    }
+
+    @Test
+    public void testMethod13(){
+        String obj = null;
+
     }
 }

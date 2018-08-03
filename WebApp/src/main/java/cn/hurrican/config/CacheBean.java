@@ -49,6 +49,10 @@ public class CacheBean {
 
     private Double maxScore;
 
+    private String member;
+
+    private String rmember;
+
     public static CacheBean build() {
         return new CacheBean();
     }
