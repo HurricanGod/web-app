@@ -21,13 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -128,6 +122,7 @@ public class WriteCacheAspect {
             // 删除写模式下先删除 key 在保存
             if(args.pattern() == CacheConstant.DEL_WRITE){
                 instance.del(key);
+                existSetKey = false;
             }
             ObjectMapper mapper = new ObjectMapper();
             // 判断 cacheBean 中的 value 是否为集合类型
@@ -170,6 +165,7 @@ public class WriteCacheAspect {
             Boolean existHashKey = instance.exists(key);
             if(args.pattern() == CacheConstant.DEL_WRITE){
                 instance.del(key);
+                existHashKey = false;
             }
             ObjectMapper mapper = new ObjectMapper();
             // 要缓存的值为集合类型

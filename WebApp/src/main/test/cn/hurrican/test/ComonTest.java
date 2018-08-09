@@ -10,6 +10,7 @@ import cn.hurrican.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import net.sf.json.JSONArray;
 import ognl.Ognl;
 import ognl.OgnlContext;
@@ -17,22 +18,15 @@ import ognl.OgnlException;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @Author: Hurrican
@@ -253,23 +247,21 @@ public class ComonTest {
 
     @Test
     public void testMethod11() {
-        Function<String, Integer> function = Integer::valueOf;
-        Integer apply = function.compose((Function<String, String>) s -> s + "" + s).apply("10");
-
-        System.out.println("apply = " + apply);
-
         String hello = ((Function<String, String>) s1 -> s1 + s1)
-                .compose((Function<String, String>) str -> str.toUpperCase()).apply("Hello");
-        System.out.println("hello = " + hello);
+                .compose((Function<String, String>) String::toUpperCase).apply("Hello ");
+        System.out.println(hello);
 
-        String apply1 = ((Function<String, String>) s1 -> s1 + s1).andThen(str -> str + " ;").apply("int a = 10");
-        System.out.println("apply1 = " + apply1);
+        String line = ((Function<String, String>) s1 -> Joiner.on(" = ").join(s1, 10))
+                .compose(s2 -> "int " + s2)
+                .andThen(str -> str + " ;").apply("a");
+        System.out.println(line);
     }
 
     @Test
     public void testMethod12(){
-        List<Integer> collect = Arrays.asList(Arrays.asList(1, 6, 9), Arrays.asList(1, 2), Arrays.asList(8, 12, 3))
-                .stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+        List<Integer> collect = Stream.of(Arrays.asList(1, 6, 9),
+                Arrays.asList(1, 2), Arrays.asList(8, 12, 3))
+                .flatMap(Collection::stream).collect(Collectors.toList());
         System.out.println(collect);
 
     }
@@ -277,6 +269,13 @@ public class ComonTest {
     @Test
     public void testMethod13(){
         String obj = null;
+        IntStream.builder().add(1).add(2);
 
+        try {
+            FileOutputStream stream = new FileOutputStream("");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+        }
     }
 }
