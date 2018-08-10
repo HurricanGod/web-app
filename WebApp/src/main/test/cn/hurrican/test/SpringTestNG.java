@@ -1,22 +1,12 @@
 package cn.hurrican.test;
 
-import cn.hurrican.impl.SearchServiceImpl;
 import cn.hurrican.service.SearchService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.Test;
 
-//@ContextConfiguration(locations = {"classpath:spring-service.xml"})
-@ContextConfiguration(classes = SearchServiceImpl.class)
-public class SpringTestNG extends AbstractTestNGSpringContextTests {
+//@ContextConfiguration(locations = {"classpath:spring-service.xml"}) extends AbstractTestNGSpringContextTests
+public class SpringTestNG {
 
-    @Autowired
     private SearchService searchService;
 
-    @Test
-    public void testMethod() {
-        searchService.save();
-    }
+
 
 }
