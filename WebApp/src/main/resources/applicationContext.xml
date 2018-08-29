@@ -13,6 +13,8 @@
             <value>UTF-8</value>
         </property>
     </bean>
-    <import resource="spring-redis.xml"/>
     <import resource="spring-service.xml"/>
+    <import resource="spring-redis.xml"/>
+    <import resource="spring-tx.xml"/>
+    <import resource="spring-mvc.xml"/>
 </beans>
