@@ -31,11 +31,11 @@ public class Riddle {
     /**
      * 答案json
      */
-    private List<String> answerList;
+    private ArrayList<String> answerList;
     /**
      * 对应分值，跟 answerList一一对应，只有部分活动支持，比如双十一单身狗活动
      */
-    private List<String> scoreList = new ArrayList<>();
+    private ArrayList<String> scoreList = new ArrayList<>();
 
     /**
      * 正确答案编号 0、1、2...
@@ -130,11 +130,11 @@ public class Riddle {
         this.question = question;
     }
 
-    public List<String> getAnswerList() {
+    public ArrayList<String> getAnswerList() {
         return answerList;
     }
 
-    public void setAnswerList(List<String> answerList) {
+    public void setAnswerList(ArrayList<String> answerList) {
         this.answerList = answerList;
     }
 
@@ -142,16 +142,26 @@ public class Riddle {
         return rightIndex;
     }
 
+    public List<Integer> getScore() {
+        return score;
+    }
+
+    public void setScore(List<Integer> score) {
+        this.score = score;
+    }
+
+    public List<Integer> score;
+
 
     public void setRightIndex(String rightIndex) {
         this.rightIndex = rightIndex;
     }
 
-	public List<String> getScoreList() {
+	public ArrayList<String> getScoreList() {
 		return scoreList;
 	}
 
-	public void setScoreList(List<String> scoreList) {
+	public void setScoreList(ArrayList<String> scoreList) {
 		this.scoreList = scoreList;
 	}
 }

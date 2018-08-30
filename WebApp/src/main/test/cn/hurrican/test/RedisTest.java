@@ -1,6 +1,7 @@
 package cn.hurrican.test;
 
 import cn.hurrican.redis.RedisExecutor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +30,19 @@ public class RedisTest {
 
     private static final String SORTED_SET_KEY = "type=sorted_set:ip";
 
+    private static final String SET_KEY = "type=set:openid";
+
     @Before
     public void before(){
         executor.doInRedis(instance -> {
+
             if(instance.exists(SORTED_SET_KEY)){
                 System.out.println("删除 key = " + SORTED_SET_KEY);
                 instance.del(SORTED_SET_KEY);
+            }
+            if(instance.exists(SET_KEY)){
+                System.out.println("删除 key = " + SET_KEY);
+                instance.del(SET_KEY);
             }
         });
     }
@@ -46,9 +54,9 @@ public class RedisTest {
             Integer[] ipDigit = new Integer[4];
             Pipeline pipeline = instance.pipelined();
             String ip = null;
-            for (int i = 0; i < 10000; i++) {
+            for (int i = 0; i < 1000; i++) {
                 for (int j = 0; j < 4; j++) {
-                    ipDigit[j] = random.nextInt(2);
+                    ipDigit[j] = random.nextInt(3);
                 }
                 ip = Joiner.on(".").join(ipDigit);
                 System.out.println("ip = " + ip);
@@ -79,8 +87,37 @@ public class RedisTest {
     @Test
     public void testScard(){
         executor.doInRedis(instance -> {
-            Long count = instance.scard("0xFFFFF");
+            Set<String> set = null;
+            int count = 9;
+            String[] member = new String[count];
+            for (int i = 0; i < 8; i++) {
+                set = instance.zrangeByScore(SORTED_SET_KEY, 0, 0, 0, count);
+                System.out.println("set = " + set);
+                if(set != null && set.size() > 0){
+                    instance.zrem(SORTED_SET_KEY, set.toArray(member));
+                }
+            }
+            System.out.println(instance.zcard(SORTED_SET_KEY));
+            System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
+            set = instance.zrangeByScore(SORTED_SET_KEY, 0, 0);
+            System.out.println(set);
+        });
+    }
+
+    @Test
+    public void testSet(){
+        executor.doInRedis(instance -> {
+            String openid = "akjsjdakshdfaskdjsakdhaidh";
+
+            ObjectMapper mapper = new ObjectMapper();
+            Long count = instance.zadd(SORTED_SET_KEY, 1.0d, mapper.writeValueAsString(openid));
             System.out.println("count = " + count);
+
+            System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
+            Set<String> set = instance.zrangeByScore(SORTED_SET_KEY, 1.0, 1.0);
+            System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
+            set.forEach(System.out::println);
+
         });
     }
 }

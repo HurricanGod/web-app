@@ -64,6 +64,8 @@ public class JSONUtils {
 		defaultJsonConfig.registerJsonValueProcessor(Date.class,
 				new DateJsonValueProcessor("yyyy-MM-dd HH:mm:ss"));
 		net.sf.json.util.JSONUtils.getMorpherRegistry().registerMorpher(new DateMorpher(new String[]{"yyyy-MM-dd HH:mm:ss"}));
+		net.sf.json.util.JSONUtils.getMorpherRegistry().registerMorpher(new RiddleMorpher());
+
 	}
 	
 	public static <T> String toString(List<T> data){
