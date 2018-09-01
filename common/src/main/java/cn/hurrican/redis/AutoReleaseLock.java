@@ -38,6 +38,7 @@ public class AutoReleaseLock implements AutoCloseable {
     public void close() throws Exception {
         System.out.println("release distributed lock...");
         releaseDistributedLock();
+        this.executor = null;
     }
 
 

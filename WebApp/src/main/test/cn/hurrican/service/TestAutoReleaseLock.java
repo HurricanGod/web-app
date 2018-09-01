@@ -20,9 +20,11 @@ public class TestAutoReleaseLock {
         try (AutoReleaseLock lock = new AutoReleaseLock(executor, "type:str_lock", 5, "Thread-1")) {
             boolean successLock = lock.tryGetDistributedLock();
             System.out.println("successLock = " + successLock);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("executor == null = " + (executor == null));
         System.out.println("done...");
     }
 }
