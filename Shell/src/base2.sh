@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -a list=(1, 2, 3, 4, 5, 6)
+declare -a list=(1 2 3 4 5 6)
 echo "first element is ${list[0]}"
 echo "list[@] is ${list[@]}"
 echo "list[*] is ${list[*]}"
