@@ -167,4 +167,16 @@ public class CommonTest1 {
         List<Riddle> list = JSONUtils.toList(json, Riddle.class);
         list.forEach(System.out::println);
     }
+
+    @Test
+    public void testMethod12(){
+        String openid = "ohVP20A0_-P1F4nKhvdLmJ_CfpWY";
+        char[] chars = openid.toCharArray();
+        char[] exposedchar = new char[openid.length()];
+        for (int i = 0; i < chars.length; i++) {
+            exposedchar[i] = (char) (chars[i] + 1);
+        }
+        String exposeOpenid = new String(exposedchar);
+        System.out.println("exposeOpenid = " + exposeOpenid);
+    }
 }

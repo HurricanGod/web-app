@@ -1,5 +1,7 @@
 package cn.hurrican.model;
 
+import net.sf.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,5 +92,11 @@ public class ResMessage {
 
     public void setModel(Map<String, Object> model) {
         this.model = model;
+    }
+
+
+    @Override
+    public String toString() {
+        return JSONObject.fromObject(this).toString();
     }
 }

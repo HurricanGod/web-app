@@ -12,16 +12,18 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +38,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -278,15 +279,31 @@ public class ComonTest {
     }
 
     @Test
-    public void testMethod13(){
-        String obj = null;
-        IntStream.builder().add(1).add(2);
-
-        try {
-            FileOutputStream stream = new FileOutputStream("");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
+    public void testMethod13() throws IOException, OgnlException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource("txt/init.json");
+        String path = resource.getPath();
+        System.out.println(path);
+        File file = new File(path);
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] byteArray = new byte[2048];
+        StringBuilder builder = new StringBuilder(8192);
+        int len = 0;
+        while ((len = inputStream.read(byteArray)) != -1) {
+            String str = new String(byteArray, 0, len);
+            builder.append(str);
         }
+        String json = builder.toString();
+        JSONObject jsonObject = JSONObject.fromObject(json);
+        OgnlContext context = new OgnlContext();
+        context.setRoot(jsonObject);
+        Object expression = Ognl.parseExpression("model.prizeList[0]");
+        Object sizeExpression = Ognl.parseExpression("model.prizeList.size");
+
+        // 解析树状表达式，返回结果
+        Object result = Ognl.getValue(expression, context, context.getRoot());
+        System.out.println("result = " + result);
+        Object size = Ognl.getValue(sizeExpression, context, context.getRoot());
+        System.out.println("value = " + size);
     }
 }

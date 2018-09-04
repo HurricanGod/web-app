@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Author: Hurrican
- * @Description: 抽奖助手小程序发送模板消息线程池
+ * @Description:
  * @Date 2018/6/11
  * @Modified 12:12
  */
