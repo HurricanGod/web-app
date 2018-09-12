@@ -33,7 +33,7 @@
 
     <Loggers>
         <!-- root标签为log的默认输出形式 -->
-        <Root level="debug">
+        <Root level="trace">
             <!--部署到服务器上时要注释掉 -->
             <AppenderRef ref="console" level="trace"/>
             <AppenderRef ref="detailLog" level="debug"/>

@@ -78,6 +78,8 @@
         <!-- zookeeper client -->
         <zkclient.version>0.1</zkclient.version>
         <rocketmq.client.version>4.2.0</rocketmq.client.version>
+        <spring.rabbit.version>1.7.3.RELEASE</spring.rabbit.version>
+        <amqp.client>4.2.0</amqp.client>
         <fileupload.version>1.2.2</fileupload.version>
         <ognl.version>3.0.1</ognl.version>
         <javassist.version>3.14.0-GA</javassist.version>
@@ -462,6 +464,19 @@
                 <artifactId>rocketmq-client</artifactId>
                 <version>${rocketmq.client.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.amqp</groupId>
+                <artifactId>spring-rabbit</artifactId>
+                <version>${spring.rabbit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>${amqp.client}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

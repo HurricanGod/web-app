@@ -35,9 +35,9 @@ public class RabbitMqStartTest {
         UniqueKeyElement element = UniqueKeyElement.build().aidIs(1).openidIs("Hurrican");
         Random random = new Random();
         Integer millis = 0;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             element.setPlatformId(i);
-            producerService.sendDataToFontOutExchange("fanout1", element.platformIdIs(i));
+            producerService.sendDataToFontOutExchange("log_fanout_exchange", element.platformIdIs(i));
             millis = random.nextInt(1000);
             System.out.println("sleep ${sec} ms".replace("${sec}", millis.toString()));
             Thread.sleep(millis);
