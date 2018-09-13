@@ -1,0 +1,242 @@
+[
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "你平时最喜欢追什么剧？",
+    "answerList": [
+      "浪漫言情剧",
+      "情景喜剧",
+      "悬疑惊悚剧",
+      "欧美科幻剧"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "如果上帝给你次挑选男人的机会，你的选择是？",
+    "answerList": [
+      "帅气制服诱惑",
+      "霸道总裁boss",
+      "禁欲系老干部",
+      "纯嫩小鲜肉"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "你给人的第一感觉是？",
+    "answerList": [
+      "萌萌软妹纸",
+      "活泼开朗型",
+      "时尚高冷范",
+      "文艺小清新"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "对待剁手的状态是？",
+    "answerList": [
+      "思前顾后，仍然买下",
+      "毫不犹豫，买买买",
+      "纠结矛盾，最后不买",
+      "吃瓜群众，坐看剁手"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "假如你的男朋友劈腿，你的态度是？",
+    "answerList": [
+      "再给机会破镜重圆",
+      "委屈找好闺蜜痛诉",
+      "快滚不送永远债见",
+      "闭关旅游自我疗伤"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "你希望你被求婚的方式是?",
+    "answerList": [
+      "高级浪漫独家定制",
+      "让大家见证你的爱",
+      "不经意的温暖流露",
+      "二人世界甜蜜时刻"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "假如你只有3天生命，你愿意做？",
+    "answerList": [
+      "享受与家人时光",
+      "胡吃海喝约约约",
+      "安顿好一切事情",
+      "挑战自己的极限"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "来世投胎天使给你4个选项，你的选择是？",
+    "answerList": [
+      "终身孤独的女强人",
+      "嫁给帅哥的丑女",
+      "奇丑无比的富婆",
+      "爱情坎坷的大美女"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "对于爱情和面包，你的原则是？",
+    "answerList": [
+      "只要我爱，都给得起",
+      "我只负责美貌如花",
+      "你给我爱情我来挣面包",
+      "男女平等付出"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [
+      "60",
+      "40",
+      "30",
+      "20"
+    ],
+    "platformId": 0,
+    "imgUrl": "",
+    "question": "参加朋友聚会，有许多陌生人你的表现如何呢？",
+    "answerList": [
+      "对方主动热情才能放松",
+      "谈笑自如社交之星",
+      "有针对性接触陌生人",
+      "喝了酒可以很欢脱"
+    ],
+    "extend": "{\"picList\":[\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\",\"http://localhost.wjj.com/static//image/admin/newgame/def_img_1.png\"]}",
+    "rightIndex": 0,
+    "deleted": false
+  },
+  {
+    "scoreList": [],
+    "platformId": 0,
+    "answerList": [],
+    "extend": "{\"picList\":[]}",
+    "rightIndex": 0,
+    "deleted": true
+  },
+  {
+    "scoreList": [],
+    "platformId": 0,
+    "answerList": [],
+    "extend": "{\"picList\":[]}",
+    "rightIndex": 0,
+    "deleted": true
+  },
+  {
+    "scoreList": [],
+    "platformId": 0,
+    "answerList": [],
+    "extend": "{\"picList\":[]}",
+    "rightIndex": 0,
+    "deleted": true
+  },
+  {
+    "scoreList": [],
+    "platformId": 0,
+    "answerList": [],
+    "extend": "{\"picList\":[]}",
+    "rightIndex": 0,
+    "deleted": true
+  },
+  {
+    "scoreList": [],
+    "platformId": 0,
+    "answerList": [],
+    "extend": "{\"picList\":[]}",
+    "rightIndex": 0,
+    "deleted": true
+  }
+]

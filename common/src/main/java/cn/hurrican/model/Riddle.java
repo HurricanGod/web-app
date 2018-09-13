@@ -43,6 +43,16 @@ public class Riddle {
     private String rightIndex;
 
     private Boolean deleted;
+
+    public String getExtend() {
+        return extend;
+    }
+
+    public void setExtend(String extend) {
+        this.extend = extend;
+    }
+
+    private String extend;
     
     
     @Override

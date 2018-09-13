@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- monitorInterval="30" 指log4j2每隔1800秒（半小时），自动监控该配置文件是否有变化，如果变化，则自动根据文件内容重新配置 -->
 <Configuration status="trace" monitorInterval="30">
     <!-- Dev -->
     <Properties>
@@ -9,6 +10,7 @@
 
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY" />
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %class{36}#%M [line:%L] - %msg%xEx%n"/>
         </Console>
 
@@ -18,6 +20,7 @@
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
             <DefaultRolloverStrategy max="100"/>
         </RollingFile>
 
@@ -27,18 +30,39 @@
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
             <DefaultRolloverStrategy max="60"/>
         </RollingFile>
+
+
+        <RollingFile name="rabbitMqRpcServer" fileName="${LOG_HOME}/rpc_server_info.log"
+                     filePattern="${LOG_HOME}/rpc_server_info-%d{yyyy-MM-dd}-%i.log" append="true">
+            <PatternLayout pattern="%n%-4r[%d{yyyy/MM/dd HH:mm:ss}] %5p [%t] %c(%F:%L) - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="200MB" />
+            </Policies>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            <DefaultRolloverStrategy max="20" />
+        </RollingFile>
+
+
     </Appenders>
 
     <Loggers>
         <!-- root标签为log的默认输出形式 -->
-        <Root level="trace">
+        <root level="info">
             <!--部署到服务器上时要注释掉 -->
-            <AppenderRef ref="console" level="info"/>
-            <AppenderRef ref="detailLog" level="info"/>
-            <AppenderRef ref="errorLog" level="error"/>
-        </Root>
+            <AppenderRef ref="console" />
+            <AppenderRef ref="detailLog" />
+            <AppenderRef ref="errorLog" />
+        </root>
+
+        <logger name="rabbitmq.rpc.server" level="info" additivity="false">
+            <AppenderRef ref="rabbitMqRpcServer" />
+        </logger>
+
 
     </Loggers>
 </Configuration>

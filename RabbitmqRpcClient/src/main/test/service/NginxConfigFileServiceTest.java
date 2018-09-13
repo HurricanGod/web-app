@@ -23,10 +23,13 @@ public class NginxConfigFileServiceTest {
 
     @Test
     public void testGetConfigFileContent() {
-        try {
-            nginxConfigFileService.getConfigFileContent("localhost", "getConfigFileContent");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        for (int i = 0; i < 1000000; i++) {
+            try {
+                System.out.println("i = " + i);
+                nginxConfigFileService.getConfigFileContent("localhost", "getConfigFileContent");
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

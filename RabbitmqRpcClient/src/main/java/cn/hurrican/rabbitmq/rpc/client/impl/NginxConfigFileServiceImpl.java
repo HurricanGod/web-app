@@ -6,6 +6,8 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 @Service
 public class NginxConfigFileServiceImpl implements NginxConfigFileService {
+
+    private static Logger logger = LogManager.getLogger(NginxConfigFileServiceImpl.class);
 
     @Autowired
     private Connection connection;
@@ -46,9 +50,9 @@ public class NginxConfigFileServiceImpl implements NginxConfigFileService {
 
         String callbackResult = response.take();
         channel.basicCancel(consumerTag);
-        System.out.println("callbackResult = " + callbackResult);
+        logger.info("callbackResult = " + callbackResult);
         long cost = System.currentTimeMillis() - start;
-        System.out.println("cost = " + cost);
+        logger.info("cost = " + cost + "\n");
         Random random = new Random();
         return new NginxConfigVo().setId(random.nextInt(Integer.MAX_VALUE))
                 .setTimestamp(System.currentTimeMillis());
