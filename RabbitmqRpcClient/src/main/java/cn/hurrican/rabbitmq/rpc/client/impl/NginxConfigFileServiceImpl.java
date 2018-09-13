@@ -2,6 +2,7 @@ package cn.hurrican.rabbitmq.rpc.client.impl;
 
 import cn.hurrican.rabbitmq.rpc.client.entity.NginxConfigVo;
 import cn.hurrican.rabbitmq.rpc.client.service.NginxConfigFileService;
+import cn.hurrican.rabbitmq.rpc.client.service.QueueManageService;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -25,11 +26,15 @@ public class NginxConfigFileServiceImpl implements NginxConfigFileService {
     @Autowired
     private Connection connection;
 
+    @Autowired
+    private QueueManageService queueManageService;
+
+
     @Override
     public NginxConfigVo getConfigFileContent(String ip, String functionName) throws IOException, InterruptedException {
         long start = System.currentTimeMillis();
         Channel channel = connection.createChannel(false);
-        String callbackQueue = channel.queueDeclare().getQueue();
+        String callbackQueue = queueManageService.rpcCallbackQueue();
 
 
         String correlationId = UUID.randomUUID().toString();

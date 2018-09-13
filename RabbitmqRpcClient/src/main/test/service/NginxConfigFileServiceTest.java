@@ -23,7 +23,7 @@ public class NginxConfigFileServiceTest {
 
     @Test
     public void testGetConfigFileContent() {
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000; i++) {
             try {
                 System.out.println("i = " + i);
                 nginxConfigFileService.getConfigFileContent("localhost", "getConfigFileContent");
