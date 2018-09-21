@@ -1,7 +1,6 @@
 package cn.hurrican.aspect;
 
 import cn.hurrican.anotations.ValidateRequestParam;
-import cn.hurrican.exception.BaseAspectRuntimeException;
 import cn.hurrican.model.ResMessage;
 import cn.hurrican.model.Riddles;
 import org.aspectj.lang.JoinPoint;
@@ -12,11 +11,9 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @Author: Hurrican
@@ -49,7 +46,7 @@ public class ValidateParamAspect {
             if(list != null && list.size() > 0){
                 HashMap<String, Object> model = new HashMap<>();
                 model.put("test", "test");
-                throw BaseAspectRuntimeException.happend(-1, "参数非法！").returnMapEqual(model);
+//                throw BaseAspectRuntimeException.happend(-1, "参数非法！").returnMapEqual(model);
             }
         }
 

@@ -1,0 +1,10 @@
+{
+  "originalPrice": 5000,
+  "activityPrice": 3000,
+  "haha": "{\"a\":1,\"s\":2,\"d\":4,\"e\":[1,2,3,4]}",
+  "offeredLimitNum": "5",
+  "vrNum": "0",
+  "deliveryType": "商家未填写配送方式",
+  "collectSwitch": 7,
+  "collectExtend": ""
+}

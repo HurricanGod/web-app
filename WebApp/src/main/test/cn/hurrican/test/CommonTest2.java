@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -40,14 +41,20 @@ public class CommonTest2 {
 
     @Test
     public void testMethod1() throws IOException {
-        String filepath = "F:\\JavaCode\\web-app\\WebApp\\src\\main\\resources\\txt\\riddle.json";
+        String filepath = "F:\\JavaCode\\web-app\\WebApp\\src\\main\\resources\\txt\\extend.json";
         String json = FileUtils.readFileToString(new File(filepath));
-        System.out.println("json = " + json);
-        JSONArray jsonArray = JSONArray.fromObject(json);
-        List<Riddle> list = new ArrayList<>(16);
-        convertJsonArrayToList(jsonArray, list);
+        JSONObject jsonObject = JSONObject.fromObject(json);
+        Object obj = jsonObject.get("haha");
+        System.out.println(obj.getClass());
 
-        list.forEach(System.out::println);
+    }
+
+
+    @Test
+    public void testMethod2(){
+        List<Integer> list = Arrays.asList(1, 2, 3, 8, 10);
+        Integer num = list.stream().filter(e -> e > 11).findFirst().orElse(0);
+        System.out.println("num = " + num);
     }
 
     private void convertJsonArrayToList(JSONArray jsonArray, List<Riddle> list) {

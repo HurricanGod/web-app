@@ -26,5 +26,9 @@ public class TestAutoReleaseLock {
         }
         System.out.println("executor == null = " + (executor == null));
         System.out.println("done...");
+
+        executor.doInRedis(instance -> {
+
+        });
     }
 }
