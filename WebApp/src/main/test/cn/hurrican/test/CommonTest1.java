@@ -3,8 +3,8 @@ package cn.hurrican.test;
 import cn.hurrican.annotation.ReadCache;
 import cn.hurrican.model.ColorfulQuestion;
 import cn.hurrican.model.Entry;
-import cn.hurrican.model.Riddle;
 import cn.hurrican.service.DelCacheService;
+import cn.hurrican.utils.DateTimeUtils;
 import cn.hurrican.utils.JSONUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +14,16 @@ import net.sf.json.JSONObject;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -106,23 +109,31 @@ public class CommonTest1 {
 
     @Test
     public void testMethod7(){
-        List<String> list = Arrays.asList("a", "b", "c");
-        String[] memberArray = new String[list.size()];
-        String[] toArray = list.toArray(memberArray);
-        for (int i = 0; i < memberArray.length; i++) {
-            System.out.println("memberArray:\t" + memberArray[i]);
-            System.out.println("toArray:\t" +toArray[i]);
-            System.out.println();
-        }
+        long today = DateTimeUtils.getTimestampOnlyDate(System.currentTimeMillis());
+        System.out.println("today = " + today);
+
+        long timestamp = DateTimeUtils.getTimestampOnlyDate(today, -1);
+        System.out.println("timestamp = " + timestamp);
+        System.out.println();
+
+        timestamp = DateTimeUtils.getTimestampOnlyDate(today, -2);
+        System.out.println("timestamp = " + timestamp);
+        System.out.println();
+
+        timestamp = DateTimeUtils.getTimestampOnlyDate(today, 1);
+        System.out.println("timestamp = " + timestamp);
+        System.out.println();
+
     }
 
     @Test
-    public void testMethod(){
-       String response = "{\"access_token\":\"24.d964bdb44e6c6dd80e9d306599bb7ef3.2592000.1537086309.282335-11691521\",\"session_key\":\"9mzdX+OCadFTX3b9a6szil5rwbad+7FT5iH+gXyy1AUNbAPaLlstU+2RVM7ddVbht\\/h3Lq86wme9ehN9pfGMTdHzodbZVw==\",\"scope\":\"audio_voice_assistant_get audio_tts_post public brain_all_scope wise_adapt lebo_resource_base lightservice_public hetu_basic lightcms_map_poi kaidian_kaidian ApsMisTest_Test\\u6743\\u9650 vis-classify_flower lpq_\\u5f00\\u653e cop_helloScope ApsMis_fangdi_permission smartapp_snsapi_base iop_autocar oauth_tp_app smartapp_smart_game_openapi\",\"refresh_token\":\"25.a01af1db041a95cde25d2a6739c1ed73.315360000.1849854309.282335-11691521\",\"session_secret\":\"2b21e6fb333549bd46b4b7f345aa6913\",\"expires_in\":2592000}\n";
-        Map map = JSONUtils.toBean(response, Map.class);
-        map.forEach((k,v) -> {
-            System.out.printf("k = %s\nv = %s \n\n", k, v);
-        });
+    public void testMethod() throws InterruptedException {
+        double addition = DateTimeUtils.getTimeAddition(System.currentTimeMillis());
+        System.out.println("addition = " + addition);
+        Thread.sleep(10000);
+        addition = DateTimeUtils.getTimeAddition(System.currentTimeMillis());
+        System.out.println("addition = " + addition);
+
     }
 
     @Test
@@ -144,39 +155,52 @@ public class CommonTest1 {
 
     @Test
     public void testMethod11(){
-        List<Riddle> riddles = new ArrayList<>(16);
-        Riddle riddle = new Riddle();
-        riddle.setRightIndex("0");
-        riddle.setQuestion("Hello is World");
-        riddle.setDeleted(false);
-        riddle.setPlatformId(0);
-        ArrayList<String> answer = new ArrayList<>();
-        answer.add("aa");
-        answer.add("ab");
-        answer.add("ac");
-        riddle.setAnswerList(answer);
-        for (int i = 0; i < 5; i++) {
-            riddles.add(riddle);
+        List<Date> list = new ArrayList<>(16);
+        list.add(new Date());
+        list.add(new Date());
+        list.add(new Date());
+        list.add(new Date());
+        JSONArray jsonArray = JSONArray.fromObject(list);
+        for (int i = 0, size = jsonArray.size(); i < size; i++) {
+            Object o = jsonArray.get(i);
+            System.out.println(o);
         }
-        JSONArray jsonArray = JSONArray.fromObject(riddles);
-        String json = jsonArray.toString();
-        System.out.println(json);
-
-
-        System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
-        List<Riddle> list = JSONUtils.toList(json, Riddle.class);
-        list.forEach(System.out::println);
     }
 
     @Test
     public void testMethod12(){
-        String openid = "ohVP20A0_-P1F4nKhvdLmJ_CfpWY";
-        char[] chars = openid.toCharArray();
-        char[] exposedchar = new char[openid.length()];
-        for (int i = 0; i < chars.length; i++) {
-            exposedchar[i] = (char) (chars[i] + 1);
+        List<Integer> list = new ArrayList<>(16);
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            list.add(random.nextInt(100));
         }
-        String exposeOpenid = new String(exposedchar);
-        System.out.println("exposeOpenid = " + exposeOpenid);
+        System.out.println(list);
+        System.out.println();
+        List<Integer> filterList = list.stream().filter(e -> e > 50).collect(Collectors.toList());
+        System.out.println(filterList);
+        System.out.println();
+        if(filterList.size() > 0){
+            filterList.remove(0);
+        }
+        System.out.println(filterList);
+    }
+
+    @Test
+    public void testMethod13(){
+        String enc = "UTF-8";
+        String utm = "baidu.%E5%BE%AE%E4%BF%A1%E6%8A%95%E7%A5%A8.HX_%E5%BE%AE%E4%BF%A1%E6%8A%95%E7%A5%A8.post";
+        try {
+            String keyWord = URLDecoder.decode(utm, enc);
+            System.out.println(keyWord);
+
+            String[] array = keyWord.split("\\.");
+            System.out.println(array.length);
+            for (int i = 0; i < array.length; i++) {
+                System.out.println(array[i]);
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -3,20 +3,24 @@ package cn.hurrican.test;
 import cn.hurrican.config.CacheBean;
 import cn.hurrican.model.ColorfulQuestion;
 import cn.hurrican.model.Entry;
+import cn.hurrican.model.Questionnaire;
+import cn.hurrican.utils.DateTimeUtils;
 import cn.hurrican.utils.JSONUtils;
 import cn.hurrican.utils.ObjectMapperUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.junit.Test;
-import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -190,15 +194,36 @@ public class ComonTest {
 
     @Test
     public void testMethod10(){
-        Class<Jedis> jedisClass = Jedis.class;
-        List<Method> list = Arrays.stream(jedisClass.getDeclaredMethods()).filter(m -> m.toString()
-                .equals("public java.util.Set redis.clients.jedis.Jedis.zrange(java.lang.String,long,long)"))
-                .collect(Collectors.toList());
-        if(list.size() > 0){
-            Method method = list.get(0);
-            Arrays.stream(method.getParameterTypes()).forEach(p -> System.out.println(p.equals(long.class)));
-        }
+        ArrayList<Entry<String, String>> entries = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("nickname", "Wanderful");
+        jsonObject.put("count", 10);
+
+        entries.add(new Entry<>("a", "Hurrican"));
+        entries.add(new Entry<>("b", "SuperHurrican"));
+        entries.add(new Entry<>("c", jsonObject.toString()));
+
+        Questionnaire q = new Questionnaire();
+        q.setAid(1);
+        q.setUid(1);
+        q.setAid(11296);
+        q.setPageTemplateId(128);
+        q.setAnswerNotBlank(false);
+        q.setHadDeleted(false);
+        q.setOptionType(1);
+        q.setQuestionType(1);
+        q.setShowOrder(1);
+        q.setOptionList(Arrays.asList("a.....", "b....", "c...."));
+        q.setScoreList(entries);
+        q.setQuestionContent("Are you ok?");
+        q.setExtendString(jsonObject.toString());
+
+        ArrayList<Questionnaire> arrayList = new ArrayList<>();
+        arrayList.add(q);
+        arrayList.add(q);
+        System.out.println(JSONArray.fromObject(arrayList).toString());
     }
+
 
     @Test
     public void testMethod11() {
@@ -219,6 +244,29 @@ public class ComonTest {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         System.out.println(collect);
 
+    }
+
+    @Test
+    public void testMethod13() throws ParseException {
+        Date date1 = DateTimeUtils.getSimpleDate("2018-10-16 0:0:0");
+        long start = DateTimeUtils.parseDateToTimestamp(date1);
+        Date date2 = DateTimeUtils.getSimpleDate("2018-11-16 0:0:0");
+        long end = DateTimeUtils.parseDateToTimestamp(date2);
+        System.out.println(end -start);
+
+    }
+
+    @Test
+    public void testMethod14(){
+        ArrayList<Integer> list = new ArrayList<>(16);
+        list.add(6);
+        list.add(8);
+        list.add(5);
+        list.add(1);
+        list.add(112);
+        list.add(10);
+        List<Integer> collect = list.stream().sorted((e1, e2) -> e1 < e2 ? -1 : 0).collect(Collectors.toList());
+        System.out.println(collect);
     }
 
 

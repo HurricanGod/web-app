@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,18 +76,34 @@ public class OgnlExpressionTest {
             builder.append(str);
         }
         String json = builder.toString();
-        JsonExtendServiceUtils jsonUtil = JsonExtendServiceUtils.getInstance().init(json);
+        JsonExtendServiceUtils jsonUtil = JsonExtendServiceUtils.getInstance(json);
         Object model = jsonUtil.getValue("model");
         System.out.println("model = " + model);
         Integer c = jsonUtil.getValue("model.c", Integer.class);
         System.out.println("c = " + c);
-        Object jsonArray = jsonUtil.getValue("model.b");
-        System.out.println("jsonArray = " + jsonArray);
+        jsonUtil.setValue("model.d", Arrays.asList(1,2,3));
+        jsonUtil.setValue("model.f_12.a1","1");
+
+        System.out.println("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
+        System.out.println(jsonUtil.getJson());
+
+        System.out.println("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
+        System.out.println(jsonUtil.getValue("model.f_12.a1", Integer.class));
     }
 
     @Test
     public void testMethod2(){
-        Object obj = "-100000";
-        System.out.println(JsonExtendServiceUtils.toLong(obj));
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("py", 100);
+        map.put("java", 90);
+        Map<Integer, Integer> other = new HashMap<>(8);
+        other.put(1, 100);
+        other.put(2, 90);
+        JsonExtendServiceUtils jsonUtil = JsonExtendServiceUtils.getInstance("{}");
+        jsonUtil.setValue("a.b.c.d.f", 1200000);
+        jsonUtil.setValue("a.b.c.e", "Hello World");
+        jsonUtil.setValue("a.b.c.m", map);
+        jsonUtil.setValue("b", 99999);
+        System.out.println(jsonUtil.getJson());
     }
 }

@@ -1,7 +1,7 @@
 package cn.hurrican.test;
 
 import cn.hurrican.redis.RedisExecutor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cn.hurrican.utils.DateTimeUtils;
 import com.google.common.base.Joiner;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,19 +105,24 @@ public class RedisTest {
     }
 
     @Test
-    public void testSet(){
-        executor.doInRedis(instance -> {
-            String openid = "akjsjdakshdfaskdjsakdhaidh";
+    public void testSet() throws InterruptedException {
+        for (int i = 0; i < 3; i++) {
+            String member = "Hurrican" + i;
+            executor.doInRedis(instance -> {
+                double score = DateTimeUtils.getTimeAddition(System.currentTimeMillis());
+                instance.zadd(SORTED_SET_KEY, 1 + score, member);
+            });
+            System.out.println("sleep 1s ...");
+            Thread.sleep(1000);
+        }
 
-            ObjectMapper mapper = new ObjectMapper();
-            Long count = instance.zadd(SORTED_SET_KEY, 1.0d, mapper.writeValueAsString(openid));
-            System.out.println("count = " + count);
-
-            System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
-            Set<String> set = instance.zrangeByScore(SORTED_SET_KEY, 1.0, 1.0);
-            System.out.println("\n-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  \n");
-            set.forEach(System.out::println);
-
+        Set<Tuple> tuples = executor.doInRedis(instance -> {
+            return instance.zrevrangeByScoreWithScores(SORTED_SET_KEY, Double.MAX_VALUE, Double.MIN_VALUE);
         });
+
+        System.out.println("exec get operation!");
+        tuples.forEach(t -> System.out.printf("%s -> %s\n", t.getElement(), t.getScore()));
+
+
     }
 }
