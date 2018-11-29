@@ -18,18 +18,18 @@ public class ZookeeperCreateNodeTest {
         });
 
         String data = "118.89.59.66:3306";
-        String path = "/hello";
-        String subpath = path + "/hurrican";
-        String s = zooKeeper.create(path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+        String path1 = "/hello1";
+        String path2 = "/hello2";
+        String s = zooKeeper.create(path1, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         System.out.println("s = " + s);
-        zooKeeper.create(subpath, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL,
-                (rc, path1, ctx, name) -> {
+        zooKeeper.create(path2, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL,
+                (rc, path, ctx, name) -> {
                     System.out.println("rc = " + rc);
                     System.out.println("ctx = " + ctx);
                     System.out.println("name = " + name);
-                    System.out.println("path1 = " + path1);
+                    System.out.println("path1 = " + path);
                 }, "callback param");
 
-        Thread.sleep(200000);
+        Thread.sleep(90000);
     }
 }
