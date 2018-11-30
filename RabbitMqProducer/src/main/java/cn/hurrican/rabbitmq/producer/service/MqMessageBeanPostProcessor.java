@@ -35,7 +35,7 @@ public class MqMessageBeanPostProcessor implements BeanPostProcessor,Application
      */
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return null;
+        return bean;
     }
 
     /**
@@ -56,7 +56,7 @@ public class MqMessageBeanPostProcessor implements BeanPostProcessor,Application
             System.out.println("typeBeanMap.size() = " + typeBeanMap.size());
 
         }
-        return null;
+        return bean;
     }
 
 
