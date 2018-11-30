@@ -44,8 +44,9 @@ public class CommonTest2 {
         String filepath = "F:\\JavaCode\\web-app\\WebApp\\src\\main\\resources\\txt\\extend.json";
         String json = FileUtils.readFileToString(new File(filepath));
         JSONObject jsonObject = JSONObject.fromObject(json);
-        Object obj = jsonObject.get("haha");
-        System.out.println(obj.getClass());
+        Object array = jsonObject.get("ocOeEjp8wQv8FGwP0RU0xOi58fU0");
+        Object obj = jsonObject.get("aaa");
+        System.out.println(obj);
 
     }
 

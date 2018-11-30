@@ -15,7 +15,7 @@ public class ProducerService {
     private AmqpTemplate amqpTemplate;
 
     public void sendData(String key, Object obj) {
-        amqpTemplate.convertAndSend(key, obj);
+        amqpTemplate.convertAndSend("mq-exchange", key, obj);
     }
 
 

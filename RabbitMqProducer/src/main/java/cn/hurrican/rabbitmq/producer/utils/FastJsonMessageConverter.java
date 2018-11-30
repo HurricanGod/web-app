@@ -9,7 +9,6 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.AbstractMessageConverter;
 import org.springframework.amqp.support.converter.MessageConversionException;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class FastJsonMessageConverter extends AbstractMessageConverter {
@@ -35,32 +34,17 @@ public class FastJsonMessageConverter extends AbstractMessageConverter {
         return null;
     }
 
-    public <T> T fromMessage(Message message, T clazz) {
-        String json = "";
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            json = new String(message.getBody(), defaultCharset);
-            return (T) objectMapper.readValue(json, clazz.getClass());
-        } catch (IOException e) {
-            logger.error("获取信息体时发生异常：{}", e);
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     @Override
     protected Message createMessage(Object objectToConvert, MessageProperties messageProperties) {
-        byte[] bytes = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            String jsonString = null;
-            jsonString = objectMapper.writeValueAsString(objectToConvert);
-            bytes = jsonString.getBytes(this.defaultCharset);
+            System.out.println("objectToConvert.getClass() = " + objectToConvert.getClass());
+            String jsonString = objectMapper.writeValueAsString(objectToConvert);
             messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
             messageProperties.setContentEncoding(this.defaultCharset);
-            if (bytes != null) {
-                messageProperties.setContentLength(bytes.length);
-            }
+            byte[] bytes = jsonString.getBytes(this.defaultCharset);
+            messageProperties.setContentLength(bytes.length);
+
             return new Message(bytes, messageProperties);
         } catch (UnsupportedEncodingException e) {
             logger.error("发生异常：{}", e);

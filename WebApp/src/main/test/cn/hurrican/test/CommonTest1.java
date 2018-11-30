@@ -4,12 +4,12 @@ import cn.hurrican.annotation.ReadCache;
 import cn.hurrican.model.ColorfulQuestion;
 import cn.hurrican.model.Entry;
 import cn.hurrican.service.DelCacheService;
+import cn.hurrican.utils.CommonUtils;
 import cn.hurrican.utils.DateTimeUtils;
 import cn.hurrican.utils.JSONUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -127,12 +127,9 @@ public class CommonTest1 {
     }
 
     @Test
-    public void testMethod() throws InterruptedException {
-        double addition = DateTimeUtils.getTimeAddition(System.currentTimeMillis());
-        System.out.println("addition = " + addition);
-        Thread.sleep(10000);
-        addition = DateTimeUtils.getTimeAddition(System.currentTimeMillis());
-        System.out.println("addition = " + addition);
+    public void testMethod(){
+        System.out.println(List.class.isAssignableFrom(ArrayList.class));
+        System.out.println(ArrayList.class.isAssignableFrom(List.class));
 
     }
 
@@ -155,15 +152,9 @@ public class CommonTest1 {
 
     @Test
     public void testMethod11(){
-        List<Date> list = new ArrayList<>(16);
-        list.add(new Date());
-        list.add(new Date());
-        list.add(new Date());
-        list.add(new Date());
-        JSONArray jsonArray = JSONArray.fromObject(list);
-        for (int i = 0, size = jsonArray.size(); i < size; i++) {
-            Object o = jsonArray.get(i);
-            System.out.println(o);
+        for (int i = 0; i < 1000; i++) {
+            List<Integer> code = CommonUtils.generateCode(6, 0);
+            System.out.println("size = " + new HashSet<>(code).size() + "\tcode = " + code);
         }
     }
 

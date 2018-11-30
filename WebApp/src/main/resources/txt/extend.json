@@ -1,10 +1,18 @@
 {
-  "originalPrice": 5000,
-  "activityPrice": 3000,
-  "haha": "{\"a\":1,\"s\":2,\"d\":4,\"e\":[1,2,3,4]}",
-  "offeredLimitNum": "5",
-  "vrNum": "0",
-  "deliveryType": "商家未填写配送方式",
-  "collectSwitch": 7,
-  "collectExtend": ""
+  "ocOeEjp8wQv8FGwP0RU0xOi58fU0": [
+    {
+      "addressee": "朋友",
+      "content": "海阔天空",
+      "writer": "Zer.."
+    },
+    {
+      "addressee": "朋友",
+      "content": "海阔天空",
+      "writer": "Zer.."
+    }
+  ],
+  "aaa":{
+    "b":100,
+    "by":"Hurrican"
+  }
 }

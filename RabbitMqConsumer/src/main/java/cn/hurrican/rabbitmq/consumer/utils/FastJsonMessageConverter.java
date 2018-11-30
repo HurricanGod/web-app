@@ -50,17 +50,15 @@ public class FastJsonMessageConverter extends AbstractMessageConverter {
 
     @Override
     protected Message createMessage(Object objectToConvert, MessageProperties messageProperties) {
-        byte[] bytes = null;
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            String jsonString = null;
-            jsonString = objectMapper.writeValueAsString(objectToConvert);
-            bytes = jsonString.getBytes(this.defaultCharset);
+            String jsonString = objectMapper.writeValueAsString(objectToConvert);
+            byte[] bytes  = jsonString.getBytes(this.defaultCharset);
             messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
             messageProperties.setContentEncoding(this.defaultCharset);
-            if (bytes != null) {
-                messageProperties.setContentLength(bytes.length);
-            }
+            messageProperties.setContentLength(bytes.length);
+
             return new Message(bytes, messageProperties);
         } catch (UnsupportedEncodingException e) {
             logger.error("发生异常：{}", e);

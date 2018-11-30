@@ -23,7 +23,7 @@ public class RabbitMqStartTest {
     public void testMultiConsumerMsgQueue() throws InterruptedException {
         UniqueKeyElement element = UniqueKeyElement.build().aidIs(1).openidIs("Hurrican");
         Random random = new Random();
-        for (int i = 0; i < 120; i++) {
+        for (int i = 0; i < 1200; i++) {
             element.setPlatformId(i);
             producerService.sendData("save_out_log_key", element);
             Thread.sleep(random.nextInt(1000));
